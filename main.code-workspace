@@ -11,7 +11,8 @@
 			"blocks.h": "c",
 			"stdio.h": "c",
 			"*.m": "c",
-			"player.h": "c"
+			"player.h": "c",
+			"map.h": "c"
 		}
 	}
 }
