@@ -65,7 +65,7 @@ int main()
     {
         UpdateDrawFrame();
         MovePlayer(&bolinha);
-        sprintf(texto, "X: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y);
+        sprintf(texto, "dwdadX: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y);
     }
 
 
