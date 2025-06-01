@@ -16,3 +16,4 @@ void DrawPlayer(tPlayer *player){
     DrawCircleV(player->pos, 10, BLACK);
 
 }
+//TESTESTESTEST3EETSTESTESTE
