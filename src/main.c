@@ -65,7 +65,7 @@ int main()
     {
         UpdateDrawFrame();
         MovePlayer(&bolinha);
-        sprintf(texto, "X: %.2f Y: %.2f Mr Beast Leigo", bolinha.pos.x, bolinha.pos.y);
+        sprintf(texto, "X: %.2f Y: %.2f Paris", bolinha.pos.x, bolinha.pos.y);
     }
 
 
