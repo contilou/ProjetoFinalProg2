@@ -9,7 +9,6 @@ Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
 tPlayer bolinha = {{600,300}, {0,0}, 7};
 char texto[60];
-
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
 
@@ -33,8 +32,8 @@ int main()
     {
         UpdateDrawFrame();
         MovePlayer(&bolinha); //Move o jogador
-        sprintf(texto, "X: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y);
-    }
+        sprintf(texto, "X: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y); //Funciona com qlqr numeros de variaveis.
+    }                                                                  //Dentro da variavel texto , ele põe outras variaveis
 
 
     CloseWindow();                  // Fecha a janela
