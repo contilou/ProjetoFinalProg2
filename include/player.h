@@ -3,6 +3,7 @@ typedef struct {
 
     Vector2 pos;
     Vector2 direction;
+
     float speed;
 
 } tPlayer;

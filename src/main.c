@@ -25,12 +25,6 @@
 #include <string.h>
 #include "player.h"
 
-#if defined(PLATFORM_WEB)
-    #include <emscripten/emscripten.h>
-#endif
-
-
-
 //----------------------------------------------------------------------------------
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
@@ -62,9 +56,7 @@ int main()
 
     //--------------------------------------------------------------------------------------
 
-#if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
-#else
+
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
@@ -75,7 +67,7 @@ int main()
         MovePlayer(&bolinha);
         sprintf(texto, "X: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y);
     }
-#endif
+
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
