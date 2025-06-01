@@ -17,3 +17,8 @@ void DrawPlayer(tPlayer *player){
 
 }
 //ThiagoFA
+//TESTESTESTEST3EETSTESTESTE
+//INT ATERT
+//1 34134134
+// 134134
+//TRERERAER 
