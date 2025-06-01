@@ -8,7 +8,7 @@ void MovePlayer(tPlayer *player){
 
     player->pos.x += player->direction.x * player->speed;
     player->pos.y += player->direction.y * player->speed;
-
+//comentario
 }
 
 void DrawPlayer(tPlayer *player){
@@ -16,4 +16,4 @@ void DrawPlayer(tPlayer *player){
     DrawCircleV(player->pos, 10, BLACK);
 
 }
-//TESTESTESTEST3EETSTESTESTE
+//ThiagoFA
