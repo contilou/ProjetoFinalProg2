@@ -50,28 +50,28 @@ int main()
     const int screenHeight = 600;
     strcpy(texto, "oi");
 
-    InitWindow(screenWidth, screenHeight, "raylib");
+    InitWindow(screenWidth, screenHeight, "raylib");        //Inicializa janela (tamanho e título)
 
     camera.target = (Vector2){0.0f, 0.0f};
 
     //--------------------------------------------------------------------------------------
 
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    SetTargetFPS(60);               // Ajusta a execução do jogo para 60 frames por segundo
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose())    // Detecta botão de fechamento da janela ou ESC
     {
         UpdateDrawFrame();
         MovePlayer(&bolinha);
-        sprintf(texto, "dwdadX: %.2f Y: %.2f", bolinha.pos.x, bolinha.pos.y);
+        sprintf(texto, "X: %.2f Y: %.2f ABOBORA", bolinha.pos.x, bolinha.pos.y);
     }
 
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    CloseWindow();                  // Close window and OpenGL context
+    CloseWindow();                  // Fecha a janela e o contexto OpenGL
     //--------------------------------------------------------------------------------------
 
     return 0;
@@ -84,19 +84,19 @@ void UpdateDrawFrame(void)
 
     // Draw
     //----------------------------------------------------------------------------------
-    BeginDrawing();
+    BeginDrawing();     //Inicia o ambiente de desenho na tela
 
-        ClearBackground(SKYBLUE);
+        ClearBackground(SKYBLUE);   //Limpa a tela e define cor de fundo
 
         //BeginMode2D(camera);
 
-            DrawPlayer(&bolinha);
+            DrawPlayer(&bolinha);   
 
         //EndMode2D();
 
-        DrawText(texto, 10, 40, 20, DARKGRAY);
+        DrawText(texto, 10, 40, 20, DARKGRAY);  //Desenha texto, posição, tamanho e cor
 
-    EndDrawing();
+    EndDrawing();   //Finaliza o ambiente de desenho na tela
     //----------------------------------------------------------------------------------
 }
 
