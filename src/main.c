@@ -10,7 +10,7 @@ Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
 tPlayer jogador = {{0,0}, {0,0}, {0,0}, 7, IDLE};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
-char texto[60], texto2[60];
+char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
@@ -41,11 +41,14 @@ int main()
     while (!WindowShouldClose())    // Detecta botão de fechamento da janela ou ESC
     {
         UpdateDrawFrame();
-                                                                      
+
         MovePlayer(&jogador, &mapa); //Move o jogador
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
-    }
+        sprintf(textobomba, "Bombas: X");   //Preencher apos criar o sistema de bombas
+        sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
+        sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
+    }   
 
 
     CloseWindow();                  // Fecha a janela
@@ -72,7 +75,9 @@ void UpdateDrawFrame(void)
 
         DrawText(texto, 10, 15, 20, WHITE);
         DrawText(texto2, 350, 15, 20, WHITE);
-
+        DrawText(textobomba, 20,540,20, BLACK);
+        DrawText(textovida, 400,540,20, BLACK);
+        DrawText(textopont, 800,540,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
 }
