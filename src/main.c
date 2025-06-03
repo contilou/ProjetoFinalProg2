@@ -15,13 +15,12 @@ char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
 
-
 int main()
 {
     //Altura e largura da janela
     const int screenWidth = 1200;
     const int screenHeight = 600;
-
+    
     if(GetMapMatrix(&mapa) != 1){
 
         return 1;
@@ -64,7 +63,7 @@ void UpdateDrawFrame(void)
 
     BeginDrawing();     //Inicia o ambiente de desenho na tela
 
-        ClearBackground(WHITE);   //Limpa a tela e define cor de fundo
+        ClearBackground(SKYBLUE);   //Limpa a tela e define cor de fundo
 
         //BeginMode2D(camera);
 
