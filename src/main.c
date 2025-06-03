@@ -75,9 +75,9 @@ void UpdateDrawFrame(void)
 
         DrawText(texto, 10, 15, 20, WHITE);
         DrawText(texto2, 350, 15, 20, WHITE);
-        DrawText(textobomba, 20,540,20, BLACK);
-        DrawText(textovida, 400,540,20, BLACK);
-        DrawText(textopont, 800,540,20, BLACK);
+        DrawText(textobomba, 20,500,20, BLACK);
+        DrawText(textovida, 400,500,20, BLACK);
+        DrawText(textopont, 800,500,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
 }
