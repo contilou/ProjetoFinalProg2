@@ -8,7 +8,7 @@
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,0}, 7, IDLE};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, 7, IDLE};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 

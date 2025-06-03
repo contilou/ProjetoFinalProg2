@@ -30,17 +30,24 @@ void MovePlayer(tPlayer *player, tMap *map){
     //Roda apenas se o jogador não estiver se movendo
     if(player->state == IDLE){
 
-        //Corresponde a direção que o jogador está indo baseado nas teclas que o usúario pressiona
+        //Corresponde a direção de movimento (baseada nas teclas que o usúario pressiona no instante que a função foi chamada) 
+        Vector2 move_direction;
         //Se o jogador apertar o botão para esquerda (Tecla A ou seta esquerda), a direção horizontal vai ser -1, caso seja para direita (Tecla D ou seta direita), vai ser 1
-        player->direction.x = (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) - (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT));
+        move_direction.x = IsKeyDown(KEY_D) - IsKeyDown(KEY_A);
         //Se o jogador apertar o botão para baixo (Tecla S ou seta baixo), a direção vertical vai ser 1, caso seja para cima (Tecla W ou seta cima), vai ser -1
-        player->direction.y = (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) - (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP));
+        move_direction.y = IsKeyDown(KEY_S) - IsKeyDown(KEY_W);
 
-        player->matrixPos.column += player->direction.x; //Atualiza a posição horizontal (matriz) do jogador
-        player->matrixPos.row += player->direction.y; //Atualiza a posição vertical (matriz) do jogador
+        //Verifica se a direção de movimento vertical é diferente de 0
+        if(move_direction.y){
+            player->direction = (Vector2){0,move_direction.y}; //Atualiza a direção de onde o personagem está olhando como um vetor vertical (para cima ou para baixo);
+            player->matrixPos.row += player->direction.y; //Atualiza a posição vertical (matriz) do jogador
+            player->state = MOVING;
+        }
 
-        if(player->direction.x != 0 || player->direction.y != 0){
-            //Caso a direção do jogador seja diferente de 0 em qualquer um dos dois eixos, o o estado do jogador é alterado para MOVING
+        //Verifica se a direção de movimento horizontal é diferente de 0
+        if(move_direction.x){
+            player->direction = (Vector2){move_direction.x,0}; //Atualiza a direção de onde o personagem está olhando como um vetor horizontal (para esquerda ou para direita);
+            player->matrixPos.column += player->direction.x; //Atualiza a posição horizontal (matriz) do jogador
             player->state = MOVING;
         }
 

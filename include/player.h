@@ -12,7 +12,7 @@ typedef struct {
 
     tMapPos matrixPos; //Struct que armazena a posição do jogador na matriz do mapa
     Vector2 screenPos; //Posição visual do jogador (utilizando os pixels totais da tela como base)
-    Vector2 direction; //Vetor para a direção do jogador (x,y)
+    Vector2 direction; //Vetor para a direção que jogador está olhando (x,y)
 
     float speed; //Velocidade do jogador
     pState state; //Estado do jogador
