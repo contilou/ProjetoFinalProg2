@@ -4,13 +4,15 @@
 #include <string.h>
 #include "player.h"
 #include "map.h"
+#include "bomb.h"
 
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, 7, IDLE};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, 7, IDLE, 3};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
+tBomb bomba = {3, {0,0,0},{0,0,0}, {0,0,0,0,0,0}};
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
@@ -40,11 +42,12 @@ int main()
     while (!WindowShouldClose())    // Detecta botão de fechamento da janela ou ESC
     {
         UpdateDrawFrame();
-
+        BombsManager(&jogador, &mapa, &bomba);
+        PlantBomb(&bomba, &mapa);
         MovePlayer(&jogador, &mapa); //Move o jogador
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
-        sprintf(textobomba, "Bombas: X");   //Preencher apos criar o sistema de bombas
+        sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
         sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
         sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
     }   

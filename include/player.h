@@ -17,6 +17,8 @@ typedef struct {
     float speed; //Velocidade do jogador
     pState state; //Estado do jogador
 
+    int bombsLeft;
+
 } tPlayer;
 
 
