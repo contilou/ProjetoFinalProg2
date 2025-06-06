@@ -43,7 +43,6 @@ int main()
     {
         UpdateDrawFrame();
         BombsManager(&jogador, &mapa, &bomba);
-        PlantBomb(&bomba, &mapa);
         MovePlayer(&jogador, &mapa); //Move o jogador
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis

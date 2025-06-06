@@ -27,6 +27,7 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
 // gravada em planted_times[i] e a posição da bomba, em positions[i].
 // Finalmente, uma bomba a menos estará disponível para ser usada. 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb){
+    PlantBomb(bomb, map);
     if (bomb->bombsLeft==0)return;
     if (IsKeyPressed(KEY_B)){
         int current = 3-bomb->bombsLeft;
