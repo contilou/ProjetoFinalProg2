@@ -6,22 +6,21 @@
 void GetPlayerStartPos(tPlayer *player, tMap *map){
 
     for(int i = 0; i < map->rows; i++){
+        
+        for(int j = 0; j < map->columns; j++){
 
-            for(int j = 0; j < map->columns; j++){
+            if (map->matrix[i][j] == 'J'){
 
-                if (map->matrix[i][j] == 'J'){
+                //Atribuição dos valores referentes à posição na matriz do mapa
+                player->matrixPos.row = i;
+                player->matrixPos.column = j;
 
-                    //Atribuição dos valores referentes à posição na matriz do mapa
-                    player->matrixPos.row = i;
-                    player->matrixPos.column = j;
-
-                    //Atribuição dos valores referentes à posição na tela do jogo
-                    player->screenPos.x = j * map->tile_size;
-                    player->screenPos.y = i * map->tile_size;
-                }
+                //Atribuição dos valores referentes à posição na tela do jogo
+                player->screenPos.x = j * map->tile_size;
+                player->screenPos.y = i * map->tile_size;
             }
         }
-
+    }
 }
 
 //Move o jogador utilizando WASD ou as setas do teclado
@@ -36,24 +35,51 @@ void MovePlayer(tPlayer *player, tMap *map){
         move_direction.x = IsKeyDown(KEY_D) - IsKeyDown(KEY_A);
         //Se o jogador apertar o botão para baixo (Tecla S ou seta baixo), a direção vertical vai ser 1, caso seja para cima (Tecla W ou seta cima), vai ser -1
         move_direction.y = IsKeyDown(KEY_S) - IsKeyDown(KEY_W);
-
-        //Verifica se a direção de movimento vertical é diferente de 0
-        if(move_direction.y){
-            player->direction = (Vector2){0,move_direction.y}; //Atualiza a direção de onde o personagem está olhando como um vetor vertical (para cima ou para baixo);
-            player->matrixPos.row += player->direction.y; //Atualiza a posição vertical (matriz) do jogador
-            player->state = MOVING;
+        
+        if (move_direction.x == 0 && move_direction.y == 0) {
+            return;
         }
 
-        //Verifica se a direção de movimento horizontal é diferente de 0
-        if(move_direction.x){
-            player->direction = (Vector2){move_direction.x,0}; //Atualiza a direção de onde o personagem está olhando como um vetor horizontal (para esquerda ou para direita);
-            player->matrixPos.column += player->direction.x; //Atualiza a posição horizontal (matriz) do jogador
-            player->state = MOVING;
+        Vector2 final_move = {0};
+
+        // 2. Lógica de checagem com base na prioridade atual
+        if (player->horizontal_priority) {
+            // ---- PRIORIDADE HORIZONTAL ----
+            // Tenta o movimento HORIZONTAL primeiro
+            if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
+                final_move.x = move_direction.x;
+            }
+            // Se não deu, tenta o VERTICAL
+            else if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
+                final_move.y = move_direction.y;
+            }
+
+        } else {
+            // ---- PRIORIDADE VERTICAL ----
+            // Tenta o movimento VERTICAL primeiro
+            if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
+                final_move.y = move_direction.y;
+            }
+            // Se não deu, tenta o HORIZONTAL
+            else if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
+                final_move.x = move_direction.x;
+            }
         }
 
+        // 3. Aplica o movimento final (nenhuma mudança aqui)
+        if (final_move.x != 0 || final_move.y != 0) {
+            player->matrixPos.row += final_move.y;
+            player->matrixPos.column += final_move.x;
+            player->state = MOVING;
+            player->direction = final_move;
+        }
+
+        // 4. Inverte a prioridade para a PRÓXIMA chamada da função!
+        player->horizontal_priority = !player->horizontal_priority;
+    }
     //Se o jogador já estiver no estado MOVING,ou seja, a posição já matriz já tenha sido alterada), a posição do jogador na tela é alterada gradualmente em cada chamada da função
     //trazendo um efeito de suavização
-    } else if (player->state == MOVING){
+    else if (player->state == MOVING){
 
         //Posições alvos que o jogador deverá alcançar na tela 
         float goalPosX = map->tile_size * player->matrixPos.column; 
@@ -73,7 +99,6 @@ void MovePlayer(tPlayer *player, tMap *map){
     }
     
 }
-
 //Desenha um frame do sprite do jogador com base em sua posição visual (baseada na tela)
 void DrawPlayer(tPlayer *player, tMap *map){
 
