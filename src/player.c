@@ -40,41 +40,39 @@ void MovePlayer(tPlayer *player, tMap *map){
             return;
         }
 
-        Vector2 final_move = {0};
+        Vector2 goal_direction = {0};
 
-        // 2. Lógica de checagem com base na prioridade atual
+        // Realiza a checagem com base na lógica de prioridades dos eixos
         if (player->horizontal_priority) {
-            // ---- PRIORIDADE HORIZONTAL ----
-            // Tenta o movimento HORIZONTAL primeiro
+            // Para a prioridade horizontal, vai tentar o movimento horizontal primeiro
             if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
-                final_move.x = move_direction.x;
+                goal_direction.x = move_direction.x;
             }
-            // Se não deu, tenta o VERTICAL
+            // caso contrário, tentara o vertical
             else if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
-                final_move.y = move_direction.y;
+                goal_direction.y = move_direction.y;
             }
 
         } else {
-            // ---- PRIORIDADE VERTICAL ----
-            // Tenta o movimento VERTICAL primeiro
+            // Para a prioridade vertical, vai tentar o movimento vertical primeiro
             if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
-                final_move.y = move_direction.y;
+                goal_direction.y = move_direction.y;
             }
-            // Se não deu, tenta o HORIZONTAL
+            // Caso contrário, tentara o horizontal
             else if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
-                final_move.x = move_direction.x;
+                goal_direction.x = move_direction.x;
             }
         }
 
-        // 3. Aplica o movimento final (nenhuma mudança aqui)
-        if (final_move.x != 0 || final_move.y != 0) {
-            player->matrixPos.row += final_move.y;
-            player->matrixPos.column += final_move.x;
+        // Realiza o movimento com base na direção
+        if (goal_direction.x != 0 || goal_direction.y != 0) {
+            player->matrixPos.row += goal_direction.y;
+            player->matrixPos.column += goal_direction.x;
             player->state = MOVING;
-            player->direction = final_move;
+            player->direction = goal_direction;
         }
 
-        // 4. Inverte a prioridade para a PRÓXIMA chamada da função!
+        //Inverte a prioridade para a próxima chamada da função 
         player->horizontal_priority = !player->horizontal_priority;
     }
     //Se o jogador já estiver no estado MOVING,ou seja, a posição já matriz já tenha sido alterada), a posição do jogador na tela é alterada gradualmente em cada chamada da função
