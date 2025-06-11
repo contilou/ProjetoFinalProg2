@@ -1,15 +1,9 @@
 #include <raylib.h>
 #include <math.h>
-#include "player.h"
-#include "map.h"
+#include "bomb.h"
 
 // salva as informações de cada uma das 3 bombas
-typedef struct{
-    int bombsLeft;
-    bool isPlanted[3];
-    double planted_times[3];
-    Vector2 positions[3];
-} tBomb;
+
 
 // checa se isPlanted[i] é true, e se a diferença de tempo desde que foi plantada é menor do que 3 (planted_times[i]).
 // enquanto ambos forem verdadeiros, o retângulo vermelho será desenhado na posição positions[i].
