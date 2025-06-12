@@ -2,15 +2,12 @@
 #include <math.h>
 #include "bomb.h"
 
-// salva as informações de cada uma das 3 bombas
-
-
 // checa se isPlanted[i] é true, e se a diferença de tempo desde que foi plantada é menor do que 3 (planted_times[i]).
 // enquanto ambos forem verdadeiros, o retângulo vermelho será desenhado na posição positions[i].
 void PlantBomb(tBomb *bomb, tMap *mapa){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true && GetTime()-bomb->planted_times[i]<3){
-            DrawRectangle(bomb->positions[i].x, bomb->positions[i].y, mapa->tile_size, mapa->tile_size, RED);
+            DrawRectangle(bomb->positions[i].column, bomb->positions[i].row, mapa->tile_size, mapa->tile_size, RED);
         }
     }
 }
@@ -26,9 +23,9 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb){
     if (IsKeyPressed(KEY_B)){
         int current = 3-bomb->bombsLeft;
         bomb->isPlanted[current] = true;
-        Vector2 vector;
-        vector.x = player->direction.x*map->tile_size + player->screenPos.x;
-        vector.y = player->direction.y*map->tile_size + player->screenPos.y;
+        tMapPos vector;
+        vector.column = player->direction.x + player->matrixPos.column;
+        vector.row = player->direction.y + player->matrixPos.row;
         bomb->positions[current] = vector;
         bomb->planted_times[current] = GetTime();
         bomb->bombsLeft--;

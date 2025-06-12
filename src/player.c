@@ -47,20 +47,27 @@ void MovePlayer(tPlayer *player, tMap *map){
             // Para a prioridade horizontal, vai tentar o movimento horizontal primeiro
             if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
                 goal_direction.x = move_direction.x;
+                player->horizontal_priority = false;
+
+
             }
             // caso contrário, tentara o vertical
             else if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
                 goal_direction.y = move_direction.y;
+                player->horizontal_priority = true;
             }
 
         } else {
             // Para a prioridade vertical, vai tentar o movimento vertical primeiro
             if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
                 goal_direction.y = move_direction.y;
+                player->horizontal_priority = true;
+
             }
             // Caso contrário, tentara o horizontal
             else if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
                 goal_direction.x = move_direction.x;
+                player->horizontal_priority = false;
             }
         }
 
@@ -71,9 +78,6 @@ void MovePlayer(tPlayer *player, tMap *map){
             player->state = MOVING;
             player->direction = goal_direction;
         }
-
-        //Inverte a prioridade para a próxima chamada da função 
-        player->horizontal_priority = !player->horizontal_priority;
     }
     //Se o jogador já estiver no estado MOVING,ou seja, a posição já matriz já tenha sido alterada), a posição do jogador na tela é alterada gradualmente em cada chamada da função
     //trazendo um efeito de suavização

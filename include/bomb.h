@@ -3,6 +3,7 @@
 #include "map.h"
 #include "player.h"
 
+// salva as informações de cada uma das 3 bombas
 typedef struct{
     int bombsLeft;
     bool isPlanted[3];
