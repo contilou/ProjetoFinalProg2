@@ -8,19 +8,11 @@ typedef struct{
     int bombsLeft;
     bool isPlanted[3];
     double planted_times[3];
-    Vector2 positions[3];
+    tMapPos positions[3];
 } tBomb;
 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb);
-
 void PlantBomb(tBomb *bomb, tMap *mapa);
-
-
-
-
-
-
-
 
 
 #endif
