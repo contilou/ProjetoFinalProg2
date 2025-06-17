@@ -7,7 +7,7 @@
 void PlantBomb(tBomb *bomb, tMap *mapa){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true && GetTime()-bomb->planted_times[i]<3){
-            DrawRectangle(bomb->positions[i].column, bomb->positions[i].row, mapa->tile_size, mapa->tile_size, RED);
+            DrawRectangle(bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, mapa->tile_size, mapa->tile_size, RED);
         }
     }
 }
