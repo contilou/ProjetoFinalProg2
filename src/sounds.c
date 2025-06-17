@@ -8,7 +8,7 @@ AudioManager Carregasom(void) {
     AudioManager audio = {0}; // Cria a struct e zera seus valores
 
     // Carrega cada som e o atribui ao campo correspondente na struct
-    audio.somBomba = LoadSound("bomba.wav");
+    audio.somBomba = LoadSound("audio/bomba.wav");
     // Verificação para ver se os audios foram corretamentes carregados
     if (audio.somBomba.stream.buffer == NULL) TraceLog(LOG_WARNING, "AUDIO: Falha ao carregar 'bomba.wav'");
     return audio; // Retorna a struct com todos os sons carregados
