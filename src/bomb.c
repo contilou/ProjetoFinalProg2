@@ -3,8 +3,16 @@
 #include "bomb.h"
 
 void explosionEffect(tBomb *bomb, tMap *mapa, int index){
-    for(int i=0;i<9;i++)
-        DrawRectangle(bomb->area[index][i].column * mapa->tile_size, bomb->area[index][i].row * mapa->tile_size, mapa->tile_size, mapa->tile_size, LIGHTGRAY);
+    for(int i=0;i<9;i++){
+        int xPos = bomb->area[index][i].column;
+        int yPos = bomb->area[index][i].row;
+        // checa se a posição anterior não é uma parede
+        if (i==2 && mapa->matrix[yPos-1][xPos]=='W') continue;
+        if (i==4 && mapa->matrix[yPos+1][xPos]=='W') continue;
+        if (i==6 && mapa->matrix[yPos][xPos-1]=='W') continue;
+        if (i==8 && mapa->matrix[yPos][xPos+1]=='W') continue;
+        DrawRectangle(xPos * mapa->tile_size, yPos * mapa->tile_size, mapa->tile_size, mapa->tile_size, LIGHTGRAY);
+    }
 }
 
 // checa se isPlanted[i] é true, e se a diferença de tempo desde que foi plantada é menor do que 3 (planted_times[i]).
@@ -19,7 +27,7 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
                 bomb->exploded[i]=true;
                 bomb->bombsLeft++;
                 bomb->isPlanted[i]=false;
-                if (GetTime() - bomb->explosion_times[i]<2)
+                if (GetTime() - bomb->explosion_times[i]<1.5)
                     explosionEffect(bomb, mapa, i);
             }
        }
