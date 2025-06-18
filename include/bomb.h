@@ -2,6 +2,7 @@
 #define BOMB_H_
 #include "map.h"
 #include "player.h"
+#include "sounds.h"
 
 // salva as informações de cada uma das 3 bombas
 typedef struct{
@@ -14,7 +15,7 @@ typedef struct{
     tMapPos area[3][9];
 } tBomb;
 
-void BombsManager(tPlayer *player, tMap *map, tBomb *bomb);
+void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio);
 void PlantBomb(tBomb *bomb, tMap *mapa);
 
 

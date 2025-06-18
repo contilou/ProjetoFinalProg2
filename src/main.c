@@ -5,6 +5,8 @@
 #include "player.h"
 #include "map.h"
 #include "bomb.h"
+#include "sounds.h"
+
 
 //Variaveis locais
 Camera2D camera = { 0 };
@@ -16,7 +18,6 @@ tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
-
 int main()
 {
     //Altura e largura da janela
@@ -28,12 +29,11 @@ int main()
         return 1;
 
     }
-
     GetPlayerStartPos(&jogador, &mapa);
 
     InitWindow(screenWidth, screenHeight, "raylib");        //Inicializa janela (tamanho e título)
     camera.target = (Vector2){0.0f, 0.0f};
-
+    AudioManager audio = Carregasom();
 
     SetTargetFPS(60);               // Executa jogo para 60 frames por segundo
 
@@ -42,16 +42,17 @@ int main()
     while (!WindowShouldClose())    // Detecta botão de fechamento da janela ou ESC
     {
         UpdateDrawFrame();
-        BombsManager(&jogador, &mapa, &bomba);
+        BombsManager(&jogador, &mapa, &bomba, audio);
         MovePlayer(&jogador, &mapa); //Move o jogador
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
         sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
         sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
         sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
+        
     }   
 
-
+    Eliminasom(audio);
     CloseWindow();                  // Fecha a janela
 
 

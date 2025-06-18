@@ -69,6 +69,7 @@
   "files.associations": {
     "bomb.h": "c",
     "math.h": "c",
-    "raylib.h": "c"
+    "raylib.h": "c",
+    "sounds.h": "c"
   }
 }

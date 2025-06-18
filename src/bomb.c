@@ -1,6 +1,9 @@
 #include <raylib.h>
 #include <math.h>
 #include "bomb.h"
+#include "sounds.h"
+// salva as informações de cada uma das 3 bombas
+
 
 void explosionEffect(tBomb *bomb, tMap *mapa, int index){
     for(int i=0;i<9;i++){
@@ -50,18 +53,20 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
 int x[]={0,0,0,0,1,2,-1,-2};
 int y[]={1,2,-1,-2,0,0,0,0}; 
 int total_planted = 0;
-void BombsManager(tPlayer *player, tMap *map, tBomb *bomb){
+
+// Finalmente, uma bomba a menos estará disponível para ser usada. 
+void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
     PlantBomb(bomb, map);
     if (bomb->bombsLeft==0)return;
     if (IsKeyPressed(KEY_B)){
-        // checks if the planting pos is not a wall
         tMapPos vector;
         vector.column = player->direction.x + player->matrixPos.column;
         vector.row = player->direction.y + player->matrixPos.row;
         if (map->matrix[vector.row][vector.column]=='W'){
             return;
         }
-
+        
+        PlaySound(audio.somBomba);
         int current = total_planted%3;
         bomb->isPlanted[current] = true;
         bomb->positions[current] = vector;
