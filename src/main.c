@@ -6,6 +6,7 @@
 #include "map.h"
 #include "bomb.h"
 #include "sounds.h"
+#include "enemy.h"
 
 
 //Variaveis locais
@@ -15,6 +16,7 @@ tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0},{0,0,0}, {0,0,0,0,0,0}};
+EnemyGroup enemyGroup;
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
 int main()
@@ -29,7 +31,8 @@ int main()
 
     }
     GetPlayerStartPos(&jogador, &mapa);
-
+    InitEnemies(&enemyGroup, &mapa);
+    
     InitWindow(screenWidth, screenHeight, "raylib");        //Inicializa janela (tamanho e título)
     camera.target = (Vector2){0.0f, 0.0f};
     AudioManager audio = Carregasom();
@@ -40,9 +43,12 @@ int main()
     // Game loop
     while (!WindowShouldClose())    // Detecta botão de fechamento da janela ou ESC
     {
+        
         UpdateDrawFrame();
         BombsManager(&jogador, &mapa, &bomba, audio);
         MovePlayer(&jogador, &mapa); //Move o jogador
+        float dt = GetFrameTime();
+        UpdateEnemies(&enemyGroup, dt, &mapa);
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
         sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
@@ -51,6 +57,7 @@ int main()
         
     }   
 
+    FreeEnemies(&enemyGroup);
     Eliminasom(audio);
     CloseWindow();                  // Fecha a janela
 
@@ -71,6 +78,7 @@ void UpdateDrawFrame(void)
 
             DrawWalls(&mapa);
             DrawPlayer(&jogador, &mapa);  //Desenha o jogador 
+            DrawEnemies(&enemyGroup, &mapa); //Desenha os inimigos
 
         //EndMode2D();
 
