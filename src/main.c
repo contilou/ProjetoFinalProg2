@@ -16,6 +16,7 @@ tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
+EnemyGroup enemyGroup;
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
