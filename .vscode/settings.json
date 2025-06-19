@@ -67,6 +67,9 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
+    "bomb.h": "c",
+    "math.h": "c",
+    "raylib.h": "c",
     "sounds.h": "c"
   }
 }

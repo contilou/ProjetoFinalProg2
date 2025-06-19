@@ -8,8 +8,11 @@
 typedef struct{
     int bombsLeft;
     bool isPlanted[3];
+    bool exploded[3];
     double planted_times[3];
+    double explosion_times[3];
     tMapPos positions[3];
+    tMapPos area[3][9];
 } tBomb;
 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio);
