@@ -24,7 +24,7 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true){
             if(GetTime()-bomb->planted_times[i]<3){
-                DrawRectangle(bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, mapa->tile_size, mapa->tile_size, RED);
+                DrawRectangle(bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, mapa->tile_size, mapa->tile_size, DARKGRAY);
         }
             else{
                 bomb->exploded[i]=true;
@@ -62,7 +62,7 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         tMapPos vector;
         vector.column = player->direction.x + player->matrixPos.column;
         vector.row = player->direction.y + player->matrixPos.row;
-        if (map->matrix[vector.row][vector.column]=='W'){
+        if (map->matrix[vector.row][vector.column]!=' '){
             return;
         }
         

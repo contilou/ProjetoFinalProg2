@@ -7,7 +7,7 @@
 #include "bomb.h"
 #include "sounds.h"
 #include "enemy.h"
-
+#include "box.h"
 
 //Variaveis locais
 Camera2D camera = { 0 };
@@ -17,6 +17,8 @@ tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
 EnemyGroup enemyGroup;
+tBoxGroup boxGroup;
+
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
@@ -33,6 +35,7 @@ int main()
     }
     GetPlayerStartPos(&jogador, &mapa);
     InitEnemies(&enemyGroup, &mapa);
+    InitBoxes(&boxGroup, &mapa);
     
     InitWindow(screenWidth, screenHeight, "raylib");        //Inicializa janela (tamanho e título)
     camera.target = (Vector2){0.0f, 0.0f};
@@ -80,6 +83,7 @@ void UpdateDrawFrame(void)
             DrawWalls(&mapa);
             DrawPlayer(&jogador, &mapa);  //Desenha o jogador 
             DrawEnemies(&enemyGroup, &mapa); //Desenha os inimigos
+            DrawBoxes(&boxGroup, &mapa);
 
         //EndMode2D();
 
