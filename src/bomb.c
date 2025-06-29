@@ -30,13 +30,16 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
                 bomb->exploded[i]=true;
                 bomb->bombsLeft++;
                 bomb->isPlanted[i]=false;
-                if (GetTime() - bomb->explosion_times[i]<1.5)
+                if (GetTime() - bomb->explosion_times[i]<1.5){
                     explosionEffect(bomb, mapa, i);
+                }
             }
        }
         else if (bomb->exploded[i]==true){
-            if (GetTime() - bomb->explosion_times[i]<1.5)
+            mapa->matrix[bomb->positions[i].row][bomb->positions[i].column] = ' ';
+            if (GetTime() - bomb->explosion_times[i]<1.5){
                 explosionEffect(bomb, mapa, i);
+            }
             else{
                 bomb->exploded[i]=false;
             }
@@ -72,6 +75,7 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         bomb->positions[current] = vector;
         bomb->planted_times[current] = GetTime();
         bomb->explosion_times[current] = GetTime()+3;
+        map->matrix[bomb->positions[current].row][bomb->positions[current].column] = 'b';
         //armazena os dados em area[current]
         bomb->area[current][0] = bomb->positions[current];
         for (int i=1; i<9; i++){

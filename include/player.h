@@ -20,6 +20,8 @@ typedef struct {
 
     int bombsLeft;
 
+    int keys;
+
 } tPlayer;
 
 
@@ -28,5 +30,6 @@ typedef struct {
 void GetPlayerStartPos(tPlayer *player, tMap *map);
 void MovePlayer(tPlayer *player, tMap* map);
 void DrawPlayer(tPlayer *player, tMap* map);
+bool isElementSolid(char elem);
 
 #endif

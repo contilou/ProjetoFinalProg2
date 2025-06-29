@@ -14,12 +14,25 @@ typedef struct {
 
 typedef struct {
 
+    tMapPos matrixPos;
+    bool unlocked;
+    bool picked;
+
+} tKey;
+
+typedef struct {
+
     tBox *boxes;
-    int count;
+    int box_count;
+    tKey *keys;
+    int key_count;
 
 } tBoxGroup;
 
 void InitBoxes(tBoxGroup *group, tMap *map);
 void DrawBoxes(tBoxGroup *group, tMap *map);
+void DrawKeys(tBoxGroup *group, tMap *map);
+void DestroyBox(tBoxGroup *group, tMapPos target_position, tMap *map);
+void CheckKey(tBoxGroup *group, tMap *map);
 
 #endif

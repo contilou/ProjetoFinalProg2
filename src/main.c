@@ -12,7 +12,7 @@
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3, 0};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
@@ -53,11 +53,24 @@ int main()
         MovePlayer(&jogador, &mapa); //Move o jogador
         float dt = GetFrameTime();
         UpdateEnemies(&enemyGroup, dt, &mapa);
+        CheckKey(&boxGroup, &mapa);
+
         sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
         sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
         sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
         sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
+
+    //Bloco de código temporário, enquanto não fiz a interação da bomba com a caixa
+        if(IsKeyPressed(KEY_P)){
+            for(int i = 0; i < boxGroup.box_count; i++){
+                tBox *currentBox = &boxGroup.boxes[i];
+            if(!currentBox->destroyed){
+                DestroyBox(&boxGroup,currentBox->matrixPos,&mapa);
+            }
+
+            }
+        }
         
     }   
 
@@ -81,9 +94,11 @@ void UpdateDrawFrame(void)
         //BeginMode2D(camera);
 
             DrawWalls(&mapa);
+            DrawKeys(&boxGroup, &mapa);
             DrawPlayer(&jogador, &mapa);  //Desenha o jogador 
             DrawEnemies(&enemyGroup, &mapa); //Desenha os inimigos
             DrawBoxes(&boxGroup, &mapa);
+            
 
         //EndMode2D();
 

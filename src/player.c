@@ -45,27 +45,27 @@ void MovePlayer(tPlayer *player, tMap *map){
         // Realiza a checagem com base na lógica de prioridades dos eixos
         if (player->horizontal_priority) {
             // Para a prioridade horizontal, vai tentar o movimento horizontal primeiro
-            if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
+            if (move_direction.x != 0 && !isElementSolid(map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x])) {
                 goal_direction.x = move_direction.x;
                 player->horizontal_priority = false;
 
 
             }
             // caso contrário, tentara o vertical
-            else if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
+            else if (move_direction.y != 0 && !isElementSolid(map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column])) {
                 goal_direction.y = move_direction.y;
                 player->horizontal_priority = true;
             }
 
         } else {
             // Para a prioridade vertical, vai tentar o movimento vertical primeiro
-            if (move_direction.y != 0 && map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column] == ' ') {
+            if (move_direction.y != 0 && !isElementSolid(map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column])){
                 goal_direction.y = move_direction.y;
                 player->horizontal_priority = true;
 
             }
             // Caso contrário, tentara o horizontal
-            else if (move_direction.x != 0 && map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x] == ' ') {
+            else if (move_direction.x != 0 && !isElementSolid(map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x])) {
                 goal_direction.x = move_direction.x;
                 player->horizontal_priority = false;
             }
@@ -73,8 +73,10 @@ void MovePlayer(tPlayer *player, tMap *map){
 
         // Realiza o movimento com base na direção
         if (goal_direction.x != 0 || goal_direction.y != 0) {
+            map->matrix[player->matrixPos.row][player->matrixPos.column] = ' ';
             player->matrixPos.row += goal_direction.y;
             player->matrixPos.column += goal_direction.x;
+            map->matrix[player->matrixPos.row][player->matrixPos.column] = 'J';
             player->state = MOVING;
             player->direction = goal_direction;
         }
@@ -101,6 +103,23 @@ void MovePlayer(tPlayer *player, tMap *map){
     }
     
 }
+
+bool isElementSolid(char elem){
+
+    switch (elem) {
+        case 'W': 
+        case 'B': 
+        case 'K': 
+        case 'E':
+        case 'D': 
+        case 'b':
+            return true;
+        default:
+            return false;
+    }
+
+}
+
 //Desenha um frame do sprite do jogador com base em sua posição visual (baseada na tela)
 void DrawPlayer(tPlayer *player, tMap *map){
 
