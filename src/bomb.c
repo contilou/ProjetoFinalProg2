@@ -9,11 +9,6 @@ void explosionEffect(tBomb *bomb, tMap *mapa, int index){
     for(int i=0;i<9;i++){
         int xPos = bomb->area[index][i].column;
         int yPos = bomb->area[index][i].row;
-        // checa se a posição anterior não é uma parede
-        if (i==2 && mapa->matrix[yPos-1][xPos]=='W') continue;
-        if (i==4 && mapa->matrix[yPos+1][xPos]=='W') continue;
-        if (i==6 && mapa->matrix[yPos][xPos-1]=='W') continue;
-        if (i==8 && mapa->matrix[yPos][xPos+1]=='W') continue;
         DrawRectangle(xPos * mapa->tile_size, yPos * mapa->tile_size, mapa->tile_size, mapa->tile_size, LIGHTGRAY);
     }
 }
@@ -79,6 +74,14 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         //armazena os dados em area[current]
         bomb->area[current][0] = bomb->positions[current];
         for (int i=1; i<9; i++){
+            
+
+            // checa se a posição anterior não é uma parede
+            if((i % 2 == 0) && map->matrix[bomb->area[current][i-1].row][bomb->area[current][i-1].column]=='W'){
+                bomb->area[current][i] = (tMapPos){-1,-1};
+                continue;
+            }
+
             bomb->area[current][i].column = bomb->positions[current].column + x[i-1];
             bomb->area[current][i].row = bomb->positions[current].row + y[i-1];
         }

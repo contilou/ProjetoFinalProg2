@@ -22,6 +22,8 @@ tBoxGroup boxGroup;
 
 //Funções locais
 void UpdateDrawFrame(void);          // Atualiza e desenha um frame
+void checkExplosion(int bombIndex);
+
 int main()
 {
     //Altura e largura da janela
@@ -61,6 +63,12 @@ int main()
         sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
         sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
 
+        for(int i = 0; i < 3; i++){
+            if(bomba.exploded[i]){
+                checkExplosion(i);
+            }
+        }
+    
     //Bloco de código temporário, enquanto não fiz a interação da bomba com a caixa
         if(IsKeyPressed(KEY_P)){
             for(int i = 0; i < boxGroup.box_count; i++){
@@ -109,6 +117,33 @@ void UpdateDrawFrame(void)
         DrawText(textopont, 800,500,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
+}
+
+void checkExplosion(int bombIndex){
+    for(int i=0;i<9;i++){
+
+        tMapPos explosionPos = {bomba.area[bombIndex][i].row,bomba.area[bombIndex][i].column};
+
+        if(explosionPos.row == -1){
+            continue;
+        }
+
+        switch (mapa.matrix[explosionPos.row][explosionPos.column]){
+            case 'K':
+            case 'B':
+                DestroyBox(&boxGroup, explosionPos, &mapa);
+                break;
+            case 'C':
+                break;
+            case 'D':
+                break;
+            case 'P':
+                break;
+            case 'E':
+                break;
+        }
+
+    }
 }
 
 
