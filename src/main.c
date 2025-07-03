@@ -40,6 +40,7 @@ int StartGame();              // começa o jogo do 0
 int LoadGame();               // carrega os dados do último jogo nas variáveis locais 
 void descontaTempo();         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
 
+
 int main()
 {
     //Altura e largura da janela

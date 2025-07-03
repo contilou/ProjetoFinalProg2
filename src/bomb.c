@@ -88,6 +88,7 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
     
 }
 
+
 void resetBombInfo(tBomb *bomb){
     bomb->bombsLeft = 3;
     for (int i=0; i<3; i++){
