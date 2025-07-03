@@ -45,7 +45,6 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
             }
        }
     }
-
 }
 
 // Enquanto houver bombas disponíveis, quando a tecla B for pressionada,
@@ -87,4 +86,12 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         //PlantBomb(bomb, map);
     }
     
+}
+
+void resetBombInfo(tBomb *bomb){
+    bomb->bombsLeft = 3;
+    for (int i=0; i<3; i++){
+        bomb->isPlanted[i]=false;
+        bomb->exploded[i]=false;
+    }
 }
