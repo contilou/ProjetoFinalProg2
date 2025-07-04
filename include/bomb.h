@@ -17,6 +17,6 @@ typedef struct{
 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio);
 void PlantBomb(tBomb *bomb, tMap *mapa);
-
+void resetBombInfo(tBomb *bomb);
 
 #endif
