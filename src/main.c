@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "player.h"
 #include "map.h"
 #include "bomb.h"
@@ -12,7 +13,7 @@
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3, 0};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
@@ -61,7 +62,7 @@ int main()
         sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
         sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
         sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
-        sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
+        sprintf(textopont, "Pontuacao: %d", jogador.score);   //Preencher apos criar o sistema de pontuacao
 
         for(int i = 0; i < 3; i++){
             if(bomba.exploded[i]){
@@ -132,14 +133,18 @@ void checkExplosion(int bombIndex){
             case 'K':
             case 'B':
                 DestroyBox(&boxGroup, explosionPos, &mapa);
+                ChangeScore(&jogador, 10);
                 break;
             case 'C':
                 break;
             case 'D':
+                ChangeScore(&jogador, 10);
                 break;
             case 'P':
+                ChangeScore(&jogador, -100);
                 break;
             case 'E':
+                ChangeScore(&jogador, 20);
                 break;
         }
 
