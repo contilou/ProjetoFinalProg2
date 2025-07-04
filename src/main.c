@@ -140,8 +140,8 @@ void checkExplosion(int bombIndex){
             case 'D':
                 ChangeScore(&jogador, 10);
                 break;
-            case 'P':
-                ChangeScore(&jogador, -100);
+            case 'J':
+
                 break;
             case 'E':
                 ChangeScore(&jogador, 20);
