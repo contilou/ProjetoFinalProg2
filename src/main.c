@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "player.h"
 #include "map.h"
 #include "bomb.h"
@@ -14,7 +15,7 @@ typedef enum GameScreen { MENU, GAMEPLAY, PAUSE} GameScreen;
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 3, 0};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
@@ -35,6 +36,8 @@ typedef struct{
 
 //Funções locais
 void UpdateDrawFrame(void);   // Atualiza e desenha um frame
+void checkExplosion(int bombIndex);
+
 int SaveGame();               // Salva o Jogo
 int StartGame();              // começa o jogo do 0
 int LoadGame();               // carrega os dados do último jogo nas variáveis locais 
@@ -151,8 +154,14 @@ int main()
             sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
             sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
             sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
-            sprintf(textopont, "Pontuacao: XXX");   //Preencher apos criar o sistema de pontuacao
+            sprintf(textopont, "Pontuacao: %d", jogador.score);   //Preencher apos criar o sistema de pontuacao
 
+        for(int i = 0; i < 3; i++){
+            if(bomba.exploded[i]){
+                checkExplosion(i);
+            }
+        }
+    
             // na transição do menu para o jogo, há um intervalo de 0.7 segundos 
             if (started){
                 WaitTime(0.3);
@@ -209,6 +218,37 @@ void UpdateDrawFrame(void)
         DrawText(textopont, 800,500,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
+}
+
+void checkExplosion(int bombIndex){
+    for(int i=0;i<9;i++){
+
+        tMapPos explosionPos = {bomba.area[bombIndex][i].row,bomba.area[bombIndex][i].column};
+
+        if(explosionPos.row == -1){
+            continue;
+        }
+
+        switch (mapa.matrix[explosionPos.row][explosionPos.column]){
+            case 'K':
+            case 'B':
+                DestroyBox(&boxGroup, explosionPos, &mapa);
+                ChangeScore(&jogador, 10);
+                break;
+            case 'C':
+                break;
+            case 'D':
+                ChangeScore(&jogador, 10);
+                break;
+            case 'J':
+
+                break;
+            case 'E':
+                ChangeScore(&jogador, 20);
+                break;
+        }
+
+    }
 }
 
 // salva as informações do jogo atual. Retorna 0 caso um erro ocorra.

@@ -18,6 +18,7 @@ typedef struct {
     float speed; //Velocidade do jogador
     pState state; //Estado do jogador
 
+    int score;
     int bombsLeft;
 
     int keys;
@@ -30,6 +31,7 @@ typedef struct {
 void GetPlayerStartPos(tPlayer *player, tMap *map);
 void MovePlayer(tPlayer *player, tMap* map);
 void DrawPlayer(tPlayer *player, tMap* map);
+void ChangeScore(tPlayer *player, int score);
 bool isElementSolid(char elem);
 
 #endif

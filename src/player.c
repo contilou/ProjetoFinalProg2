@@ -120,6 +120,11 @@ bool isElementSolid(char elem){
 
 }
 
+void ChangeScore(tPlayer *player, int score){
+    player->score += score;
+    player->score = (player->score < 0) ? 0 : player->score;
+}
+
 //Desenha um frame do sprite do jogador com base em sua posição visual (baseada na tela)
 void DrawPlayer(tPlayer *player, tMap *map){
 
