@@ -86,7 +86,6 @@ void CheckKey(tBoxGroup *group, tMap *map){
 
 }
 
-
 void DestroyBox(tBoxGroup *group, tMapPos target_position, tMap *map){
 
     for(int i = 0; i < group->box_count; i++){
@@ -96,20 +95,18 @@ void DestroyBox(tBoxGroup *group, tMapPos target_position, tMap *map){
             map->matrix[target_position.row][target_position.column] = ' ';
             if(currentBox->hasKey){
                 map->matrix[currentBox->matrixPos.row][currentBox->matrixPos.column] = 'C';
-                    for(int i = 0; i < group->key_count; i++){
-                        tKey *currentKey = &group->keys[i];
-                        if(!currentKey->unlocked){
+                for(int i = 0; i < group->key_count; i++){
+                    tKey *currentKey = &group->keys[i];
+                    if(!currentKey->unlocked){
 
-                            currentKey->unlocked = true;
-                            currentKey->picked = false;
-                            currentKey->matrixPos = (tMapPos){currentBox->matrixPos.row,currentBox->matrixPos.column};
-                            break;
-
-                        }
+                        currentKey->unlocked = true;
+                        currentKey->picked = false;
+                        currentKey->matrixPos = (tMapPos){currentBox->matrixPos.row,currentBox->matrixPos.column};
+                        break;
+                        
                     }
+                }
             }
         }
-
-    }
-   
+    }   
 }

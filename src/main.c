@@ -9,6 +9,7 @@
 #include "sounds.h"
 #include "enemy.h"
 #include "box.h"
+#include "wallD.h"
 
 typedef enum GameScreen { MENU, GAMEPLAY, PAUSE} GameScreen;
 
@@ -21,6 +22,7 @@ char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
 EnemyGroup enemyGroup;
 tBoxGroup boxGroup;
+tWallDGroup wallDGroup;
 int started = 0;
 double startPauseTime;
 
@@ -156,11 +158,11 @@ int main()
             sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
             sprintf(textopont, "Pontuacao: %d", jogador.score);   //Preencher apos criar o sistema de pontuacao
 
-        for(int i = 0; i < 3; i++){
-            if(bomba.exploded[i]){
-                checkExplosion(i);
+            for(int i = 0; i < 3; i++){
+                if(bomba.exploded[i]){
+                    checkExplosion(i);
+                }
             }
-        }
     
             // na transição do menu para o jogo, há um intervalo de 0.7 segundos 
             if (started){
@@ -168,18 +170,16 @@ int main()
                 started=0;
             }
 
-            //Bloco de código temporário, enquanto não fiz a interação da bomba com a caixa
+            //Bloco de código temporário, enquanto não fiz a interação da bomba com a Parede destrutivel
             if(IsKeyPressed(KEY_P)){
-                for(int i = 0; i < boxGroup.box_count; i++){
-                    tBox *currentBox = &boxGroup.boxes[i];
-                if(!currentBox->destroyed){
-                    DestroyBox(&boxGroup,currentBox->matrixPos,&mapa);
-                }
-
+                for(int i = 0; i < wallDGroup.WallD_count; i++){
+                    tWallD *currentWallD = &wallDGroup.WallD[i];
+                    if(!currentWallD->destroyed){
+                        DestroyWallD(&wallDGroup,currentWallD->matrixPos,&mapa);
+                    }
                 }
             }
-        }
-        
+        } 
     }
  
 
@@ -238,6 +238,7 @@ void checkExplosion(int bombIndex){
             case 'C':
                 break;
             case 'D':
+                DestroyWallD(&wallDGroup, explosionPos, &mapa);
                 ChangeScore(&jogador, 10);
                 break;
             case 'J':
@@ -290,6 +291,7 @@ int StartGame(){
     GetPlayerStartPos(&jogador, &mapa);
     InitEnemies(&enemyGroup, &mapa);
     InitBoxes(&boxGroup, &mapa);
+    InitWallD(&wallDGroup, &mapa);
     camera.target = (Vector2){0.0f, 0.0f};
     return 1;
 }

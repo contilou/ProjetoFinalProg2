@@ -73,12 +73,20 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         //armazena os dados em area[current]
         bomb->area[current][0] = bomb->positions[current];
         for (int i=1; i<9; i++){
-            
 
             // checa se a posição anterior não é uma parede
-            if((i % 2 == 0) && map->matrix[bomb->area[current][i-1].row][bomb->area[current][i-1].column]=='W'){
-                bomb->area[current][i] = (tMapPos){-1,-1};
-                continue;
+            if((i % 2 == 0)){
+
+                switch(map->matrix[bomb->area[current][i-1].row][bomb->area[current][i-1].column]){
+
+                    case 'W':
+                    case 'D':
+                        bomb->area[current][i] = (tMapPos){-1,-1};
+                        continue;
+                        break;
+                        
+                }
+
             }
 
             bomb->area[current][i].column = bomb->positions[current].column + x[i-1];

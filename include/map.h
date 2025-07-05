@@ -19,7 +19,6 @@ typedef struct {
     int row;
     int column;
 
-    
 } tMapPos;
 
 int GetMapMatrix(tMap* map); //Abre o arquivo de texto com o mapa e o preenche na matriz do mapa

@@ -50,20 +50,22 @@ int GetMapMatrix(tMap *map){
     return 1;
 }
 
-//Percorre a matriz do mapa e desenha na tela uma parede para cada elemento que tiver 'W' (Deve ser utilizada na área de desenho na main.c
-
+//Percorre a matriz do mapa e desenha na tela uma parede indestrutivel para cada elemento que tiver 'W'  (Deve ser utilizada na área de desenho na main.c
+//E desenha na tela uma parede destruitivel para cada elemento que tiver 'D' 
 void DrawWalls(tMap* map){
 
     for(int i = 0; i < map->rows; i++){
 
         for(int j = 0; j < map->columns; j++){
-
-            if (map->matrix[i][j] == 'W'){
-
-                DrawRectangle(j * map->tile_size, i * map->tile_size, map->tile_size, map->tile_size, GRAY);
-
-            }
+            switch (map->matrix[i][j]) {
+                case 'W':
+                    DrawRectangle(j * map->tile_size, i * map->tile_size, map->tile_size, map->tile_size, GRAY);
+                    break;
+            
+                case 'D':
+                    DrawRectangle(j * map->tile_size, i * map->tile_size, map->tile_size, map->tile_size, BLACK);
+                    break;
+            } 
         }
     }
-
  }
