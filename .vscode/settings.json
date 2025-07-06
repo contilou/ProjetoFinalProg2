@@ -70,6 +70,8 @@
     "bomb.h": "c",
     "math.h": "c",
     "raylib.h": "c",
-    "sounds.h": "c"
+    "sounds.h": "c",
+    "map.h": "c",
+    "player.h": "c"
   }
 }

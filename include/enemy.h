@@ -7,9 +7,10 @@
 typedef struct {
 
     tMapPos matrixPos;
-    Vector2 position;
+    Vector2 screenPos;
     Vector2 direction;
     float speed;
+    float timerDireção;
     bool isAlive;
 
 } Enemy;

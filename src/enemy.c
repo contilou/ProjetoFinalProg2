@@ -3,91 +3,108 @@
 #include "enemy.h"
 
 void InitEnemies(EnemyGroup *group, tMap *map) {
-
-    int total = 0;
     
-    //Lê a quantidade de inimigos no mapa
-    for(int i = 0; i < map->rows; i++) {
+    int totalEnemies = 0;
+    // Conta quantos inimigos existem no mapa
+    for (int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->columns; j++) {
-            if(map->matrix[i][j] == 'E') {
-                total++;
-            }
+            if (map->matrix[i][j] == 'E') totalEnemies++;
         }
     }
-    
-    //Aloca dinamicamente a memória para os inimigos
-    group->count = total;
-    group->enemies = malloc(sizeof(Enemy) * total);
 
-    //Inicializa os inimigos
+    // Aloca memória para os inimigos
+    group->count = totalEnemies;
+    group->enemies = malloc(sizeof(Enemy) * totalEnemies);
+
+    // Inicializa os inimigos no mapa 
     int k = 0;
-    for(int i = 0; i < map->rows; i++) {
+    for (int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->columns; j++) {
-            if(map->matrix[i][j] == 'E') {
+            if (map->matrix[i][j] == 'E') {
                 Enemy *e = &group->enemies[k++];
-                e->matrixPos.row = i;
+                e->matrixPos.row    = i;
                 e->matrixPos.column = j;
-                e->position = (Vector2){j * map->tile_size, i * map->tile_size};
-                e->direction = (Vector2){1, 0};
-                e->speed = 60.0f;
-                e->isAlive = true;
+                e->screenPos.x      = j * map->tile_size;
+                e->screenPos.y      = i * map->tile_size;
+                e->speed            = 1.0f;
+                e->timerDireção     = 0;
+                map->matrix[i][j]   = ' '; 
             }
-        }
-    }
-}  
-
-void UpdateEnemies(EnemyGroup *group, float dt, tMap *map) {
-
-    //Verifica se cada inimigo continua vivo
-    for (int i = 0; i < group->count; i++) {
-        Enemy *e = &group->enemies[i];
-        if(!e->isAlive) continue;
-    
-        Vector2 newPos = {
-            e->position.x + e->direction.x * e->speed * dt,
-            e->position.y + e->direction.y * e->speed * dt
-        };
-   
-        //Converte a posição para um índice na matriz
-        int tileX = (int)(newPos.x / map->tile_size);
-        int tileY = (int) (newPos.y / map ->tile_size);
-    
-        //Verifica se há algum obstáculo
-        if(tileX >= 0 && tileX < map->columns && tileY >= 0 && tileY < map->rows) {
-            if(map->matrix[tileY][tileX] == ' ') {
-                e->position = newPos;
-                e->matrixPos.row = tileY;
-                e->matrixPos.column = tileX;
-            }
-            else {
-                //Muda de direção caso haja um obstáculo
-                int dx = 0, dy = 0;
-                while (dx == 0 && dy == 0) {
-                    dx = (rand() % 3) - 1; // -1, 0 ou 1
-                    dy = (rand() % 3) - 1;
-                    if (dx != 0 && dy != 0) {  // impede diagonal
-                        if (rand() % 2) dx = 0;
-                            else dy = 0;
-                    }
-                }
-        e->direction.x = dx;
-        e->direction.y = dy;
-    }
         }
     }
 }
 
-void DrawEnemies(EnemyGroup *group, tMap *map) {
-    //Verifica se cada inimigo está vivo e desenha no mapa
-    for(int i = 0; i < group->count; i++) {
-        if(group->enemies[i].isAlive) {
-            DrawRectangleV(group->enemies[i].position, (Vector2){map->tile_size, map->tile_size}, RED);
+void UpdateEnemies(EnemyGroup *group, float speed, tMap *map) {
+    
+    // Limpa todos os 'E's do mapa 
+    for (int i = 0; i < map->rows; i++) {
+        for (int j = 0; j < map->columns; j++) {
+            if (map->matrix[i][j] == 'E') map->matrix[i][j] = ' ';
         }
+    }
+
+    // Escolhe uma nova direção aleatoriamente
+    for (int i = 0; i < group->count; i++) {
+        Enemy *e = &group->enemies[i];
+
+        if (e->timerDireção <= 0) {
+            int d = rand() % 4;
+            if      (d == 0) { e->direction = (Vector2){ 0, -1 }; }
+            else if (d == 1) { e->direction = (Vector2){ 0,  1 }; }
+            else if (d == 2) { e->direction = (Vector2){-1,  0 }; }
+            else             { e->direction = (Vector2){ 1,  0 }; }
+            e->timerDireção = 45 + (rand() % 45);
+        }
+        e->timerDireção--;
+
+        // Nova posição 
+        Vector2 newPos = {
+            e->screenPos.x + e->direction.x * e->speed,
+            e->screenPos.y + e->direction.y * e->speed
+        };
+
+        // Hitbox
+        int tileSize = map->tile_size;
+        int ex = (int)newPos.x;
+        int ey = (int)newPos.y;
+        int left   = ex / tileSize;
+        int right  = (ex + tileSize - 1) / tileSize;
+        int top    = ey / tileSize;
+        int bottom = (ey + tileSize - 1) / tileSize;
+
+        // Verificação dos espaços em volta do inimigo
+        if (map->matrix[top][left] == ' ' &&
+            map->matrix[top][right] == ' ' &&
+            map->matrix[bottom][left] == ' ' &&
+            map->matrix[bottom][right] == ' ') {
+
+            e->screenPos = newPos;
+            e->matrixPos.row = top;
+            e->matrixPos.column = left;
+        } else {
+            e->timerDireção = 0;
+        }
+    }
+
+    // Recoloca os 'E's no mapa
+    for (int i = 0; i < group->count; i++) {
+        Enemy *e = &group->enemies[i];
+        map->matrix[e->matrixPos.row][e->matrixPos.column] = 'E';
+    }
+}
+
+void DrawEnemies(EnemyGroup *group, tMap *map) {
+    for (int i = 0; i < group->count; i++) {
+        DrawRectangleV (
+            group->enemies[i].screenPos,
+            (Vector2){ map->tile_size, map->tile_size},
+            RED
+        );
     }
 }
 
 void FreeEnemies(EnemyGroup *group) {
     free(group->enemies);
     group->enemies = NULL;
-    group->count = 0;
+    group->count   = 0;
 }
