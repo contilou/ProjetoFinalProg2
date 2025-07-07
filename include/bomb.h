@@ -13,6 +13,9 @@ typedef struct{
     double explosion_times[3];
     tMapPos positions[3];
     tMapPos area[3][9];
+    Texture2D bomb_sprite;
+    Texture2D explosion_tilemap; //Armazena o tilemap da explosão
+    Rectangle explosion_sprite_rect[9]; //Contem a àrea de tile a ser buscada no tilemap correspondente ao tile de explosão atual
 } tBomb;
 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio);

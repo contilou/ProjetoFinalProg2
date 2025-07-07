@@ -5,6 +5,8 @@ void InitBoxes(tBoxGroup *group, tMap *map) {
 
     int total = 0;
     group->key_count = 0;
+    Texture2D box_sprite_aux = LoadTexture("sprites/caixa.png");
+    Texture2D key_sprite_aux = LoadTexture("sprites/chave.png");
 
     for(int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->columns; j++) {
@@ -27,7 +29,7 @@ void InitBoxes(tBoxGroup *group, tMap *map) {
 
     for(int i = 0; i < group->key_count; i++){
         group->keys[i].unlocked = false;
-        
+        group->keys[i].key_sprite = key_sprite_aux;
     }
 
     int k = 0;
@@ -39,6 +41,8 @@ void InitBoxes(tBoxGroup *group, tMap *map) {
                 currentBox->matrixPos.column = j;
                 currentBox->destroyed = false;
                 currentBox->hasKey = (bool) (map->matrix[i][j] == 'K');
+                currentBox->box_sprite = box_sprite_aux;
+
             }
         }
     }
@@ -50,7 +54,7 @@ void DrawBoxes(tBoxGroup *group, tMap *map){
     for(int i = 0; i < group->box_count; i++){
         tBox *currentBox = &group->boxes[i];
         if(!currentBox->destroyed) {
-            DrawRectangle(currentBox->matrixPos.column * map->tile_size, currentBox->matrixPos.row * map->tile_size, map->tile_size, map->tile_size, BROWN);
+            DrawTexture(currentBox->box_sprite, currentBox->matrixPos.column * map->tile_size, currentBox->matrixPos.row * map->tile_size, WHITE);
         }
 
     }
@@ -64,7 +68,7 @@ void DrawKeys(tBoxGroup *group, tMap *map){
     for(int i = 0; i < group->key_count; i++){
         tKey *currentKey = &group->keys[i];
         if(!currentKey->picked) {
-            DrawRectangle(currentKey->matrixPos.column * map->tile_size, currentKey->matrixPos.row * map->tile_size, map->tile_size, map->tile_size, YELLOW);
+            DrawTexture(currentKey->key_sprite, currentKey->matrixPos.column * map->tile_size, currentKey->matrixPos.row * map->tile_size, WHITE);
         }
 
     }
@@ -109,4 +113,12 @@ void DestroyBox(tBoxGroup *group, tMapPos target_position, tMap *map){
             }
         }
     }   
+}
+
+void FreeBoxGroup(tBoxGroup *group) {
+    free(group->boxes);
+    group->boxes = NULL;
+
+    free(group->keys);
+    group->keys = NULL;
 }

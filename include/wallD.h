@@ -8,6 +8,7 @@ typedef struct {
 
     tMapPos matrixPos;
     bool destroyed;
+    Texture2D walld_sprite;
 
 } tWallD;
 
@@ -20,6 +21,7 @@ typedef struct {
 
 void InitWallD(tWallDGroup *group, tMap *map);
 void DestroyWallD(tWallDGroup *group, tMapPos target_position, tMap *map);
+void DrawWallsD(tWallDGroup *group, tMap *map);
 void FreeWallD(tWallDGroup *group);
 
 #endif

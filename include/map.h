@@ -10,7 +10,7 @@ typedef struct {
     int rows; //número de linhas totais do mapa (excluindo a barra da HUD)
     int columns; //número de colunas totais do mapa (excluindo a barra da HUD)
     int tile_size; //tamanho de cada quadradinho (correspondente a um elemento da matriz do mapa)
-    
+    Texture2D wall_sprite; //Sprites da parede normal
 } tMap;
 
 

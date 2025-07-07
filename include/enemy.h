@@ -12,6 +12,7 @@ typedef struct {
     float speed;
     float timerDireção;
     bool isAlive;
+    Texture2D enemy_sprite;
 
 } Enemy;
 

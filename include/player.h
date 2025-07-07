@@ -26,6 +26,7 @@ typedef struct {
     int lives;
     bool is_invincible;
     float invincibility_timer;
+    Texture2D player_sprite;
 
 } tPlayer;
 

@@ -9,7 +9,7 @@ void explosionEffect(tBomb *bomb, tMap *mapa, int index){
     for(int i=0;i<9;i++){
         int xPos = bomb->area[index][i].column;
         int yPos = bomb->area[index][i].row;
-        DrawRectangle(xPos * mapa->tile_size, yPos * mapa->tile_size, mapa->tile_size, mapa->tile_size, LIGHTGRAY);
+        DrawTextureRec(bomb->explosion_tilemap, bomb->explosion_sprite_rect[i], (Vector2){xPos * mapa->tile_size, yPos * mapa->tile_size}, WHITE);;
     }
 }
 
@@ -19,8 +19,8 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true){
             if(GetTime()-bomb->planted_times[i]<3){
-                DrawRectangle(bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, mapa->tile_size, mapa->tile_size, DARKGRAY);
-        }
+                DrawTexture(bomb->bomb_sprite, bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, WHITE);
+            }
             else{
                 bomb->exploded[i]=true;
                 bomb->bombsLeft++;
@@ -73,6 +73,7 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         map->matrix[bomb->positions[current].row][bomb->positions[current].column] = 'b';
         //armazena os dados em area[current]
         bomb->area[current][0] = bomb->positions[current];
+        bomb->explosion_sprite_rect[0] = (Rectangle){0, 0, map->tile_size, map->tile_size}; 
         for (int i=1; i<9; i++){
 
             // checa se a posição anterior não é uma parede
@@ -87,9 +88,9 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
                         break;
                         
                 }
-
             }
 
+            bomb->explosion_sprite_rect[i] = (Rectangle){map->tile_size * i, 0, map->tile_size, map->tile_size};
             bomb->area[current][i].column = bomb->positions[current].column + x[i-1];
             bomb->area[current][i].row = bomb->positions[current].row + y[i-1];
         }

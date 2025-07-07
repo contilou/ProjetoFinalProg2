@@ -5,6 +5,7 @@
 void InitWallD(tWallDGroup *group, tMap *map){
     
     int total = 0;
+    Texture2D walld_sprite_aux = LoadTexture("sprites/parededestrutivel.png");
 
     for (int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->columns; j++)
@@ -31,6 +32,7 @@ void InitWallD(tWallDGroup *group, tMap *map){
                 currentWallD->matrixPos.row = i;
                 currentWallD->matrixPos.column = j;
                 currentWallD->destroyed = false;
+                currentWallD->walld_sprite = walld_sprite_aux;
             }
         }
     }
@@ -48,6 +50,14 @@ void DestroyWallD(tWallDGroup *group, tMapPos target_position, tMap *map){
     }
 }
 
+void DrawWallsD(tWallDGroup *group, tMap *map){
+    for(int i = 0; i < group->WallD_count; i++){
+        tWallD *currentWallD = &group->WallD[i];
+        if(!currentWallD->destroyed) {
+            DrawTexture(currentWallD->walld_sprite, currentWallD->matrixPos.column * map->tile_size, currentWallD->matrixPos.row * map->tile_size, WHITE);
+        }
+    }
+}
 
 void FreeWallD(tWallDGroup *group) {
     free(group->WallD);

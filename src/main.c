@@ -19,7 +19,7 @@ tMap mapa;
 tMap *mapas = NULL;
 int num_maps = 0;
 char texto_xy[60], texto_matriz[60], textobomba[10],textovida[10],textopont[30], textochave[30], textonivel[30];
-tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
+tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0}};
 EnemyGroup enemyGroup;
 tBoxGroup boxGroup;
 tWallDGroup wallDGroup;
@@ -30,7 +30,7 @@ typedef struct{
     tMap map;
     tPlayer player;
     tBomb bomb;
-  //  tBoxGroup boxGroup;
+    // tBoxGroup boxGroup;
     EnemyGroup enemyGroup;
 } tGameInfo;
 
@@ -55,6 +55,9 @@ int main()
     InitWindow(screenWidth, screenHeight, "raylib");
     ClearBackground(RAYWHITE);
     SetTargetFPS(60);               // Executa jogo para 60 frames por segundo
+
+    bomba.bomb_sprite = LoadTexture("sprites/bomba.png");
+    bomba.explosion_tilemap = LoadTexture("sprites/bombaexplosao.png");
 
     if(InitMaps(&mapas, &num_maps) != 0){
         return 1;
@@ -213,7 +216,9 @@ int main()
             }
         } 
     }
- 
+
+    
+    FreeBoxGroup(&boxGroup);
     FreeWallD(&wallDGroup);
     FreeEnemies(&enemyGroup);
     Eliminasom(audio);
@@ -235,6 +240,7 @@ void UpdateDrawFrame(void)
         //BeginMode2D(camera);
 
             DrawWalls(&mapa);
+            DrawWallsD(&wallDGroup, &mapa);
             DrawKeys(&boxGroup, &mapa);
             DrawPlayer(&jogador, &mapa);  //Desenha o jogador 
             DrawEnemies(&enemyGroup, &mapa); //Desenha os inimigos

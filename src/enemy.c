@@ -5,6 +5,7 @@
 void InitEnemies(EnemyGroup *group, tMap *map) {
     
     int totalEnemies = 0;
+    Texture2D enemy_sprite_aux = LoadTexture("sprites/gotinha.png");
     // Conta quantos inimigos existem no mapa
     for (int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->columns; j++) {
@@ -28,7 +29,8 @@ void InitEnemies(EnemyGroup *group, tMap *map) {
                 e->screenPos.y      = i * map->tile_size;
                 e->speed            = 1.0f;
                 e->timerDireção     = 0;
-                map->matrix[i][j]   = ' '; 
+                map->matrix[i][j]   = ' ';
+                e->enemy_sprite = enemy_sprite_aux; 
             }
         }
     }
@@ -94,12 +96,10 @@ void UpdateEnemies(EnemyGroup *group, float speed, tMap *map) {
 }
 
 void DrawEnemies(EnemyGroup *group, tMap *map) {
+    
     for (int i = 0; i < group->count; i++) {
-        DrawRectangleV (
-            group->enemies[i].screenPos,
-            (Vector2){ map->tile_size, map->tile_size},
-            RED
-        );
+        Enemy *e = &group->enemies[i];
+        DrawTexture(e->enemy_sprite, e->screenPos.x, e->screenPos.y, WHITE);
     }
 }
 
