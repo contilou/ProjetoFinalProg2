@@ -3,7 +3,7 @@
 
 #include <raylib.h>
 #include "map.h"
-
+#include "enemy.h"
 typedef enum {IDLE, MOVING} pState; //Declara um enum com estados possíveis para o jogador
 
 
@@ -23,6 +23,10 @@ typedef struct {
 
     int keys;
 
+    int lives;
+    bool is_invincible;
+    float invincibility_timer;
+
 } tPlayer;
 
 
@@ -33,5 +37,6 @@ void MovePlayer(tPlayer *player, tMap* map);
 void DrawPlayer(tPlayer *player, tMap* map);
 void ChangeScore(tPlayer *player, int score);
 bool isElementSolid(char elem);
-
+void DamagePlayer(tPlayer *player);
+bool DamageByEnemies(EnemyGroup *group, tPlayer *player);
 #endif

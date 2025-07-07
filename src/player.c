@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <math.h>
 #include "player.h"
+#include "enemy.h"
 
 //Percorre a matriz do mapa e, após achar a posição inicial do jogador, armazenas na propriedades matrixPos e screenPos
 void GetPlayerStartPos(tPlayer *player, tMap *map){
@@ -26,6 +27,7 @@ void GetPlayerStartPos(tPlayer *player, tMap *map){
 //Move o jogador utilizando WASD ou as setas do teclado
 void MovePlayer(tPlayer *player, tMap *map){
 
+    
     //Roda apenas se o jogador não estiver se movendo
     if(player->state == IDLE){
 
@@ -101,6 +103,14 @@ void MovePlayer(tPlayer *player, tMap *map){
             player->state = IDLE;
         }
     }
+
+    //Sistema para sempre verificar e mover o jogador enquanto ele estiver invencível
+    if (player->is_invincible) {
+        player->invincibility_timer -= GetFrameTime();
+        if (player->invincibility_timer <= 0) {
+            player->is_invincible = false;
+        }
+    }
     
 }
 
@@ -128,7 +138,38 @@ void ChangeScore(tPlayer *player, int score){
 //Desenha um frame do sprite do jogador com base em sua posição visual (baseada na tela)
 void DrawPlayer(tPlayer *player, tMap *map){
 
-        DrawRectangle(player->screenPos.x, player->screenPos.y, map->tile_size, map->tile_size, VIOLET);
-    
+     // Se o jogador estiver invencível, ele pisca.                                                                 
+        if (player->is_invincible) {
+            // A função fmod(dividendo, divisor) retorna o resto da divisão.
+            // Usamos para criar um efeito de piscar a cada 0.2 segundos.   
+            if (fmod(player->invincibility_timer, 0.2f) > 0.1f) {
+                DrawRectangle(player->screenPos.x, player->screenPos.y, map->tile_size, map->tile_size, VIOLET);
+            }
+        } else {
+            DrawRectangle(player->screenPos.x, player->screenPos.y, map->tile_size, map->tile_size, VIOLET);
+        }
 
+}
+
+//Aplica dano ao jogador e torna ele invencível por um tempo.
+void DamagePlayer(tPlayer *player){
+    if (!player->is_invincible) {
+        player->lives--;
+        player->is_invincible = true;
+        player->invincibility_timer = 1.5f; // 1.5 segundos de invencibilidade
+    }
+}
+
+bool DamageByEnemies(EnemyGroup *group, tPlayer *player){
+    // Loop para verificar cada inimigo no grupo
+    for (int i = 0; i < group->count; i++) {
+        // Compara a posição do inimigo (usando 'group') com a do jogador (usando 'player')
+        if (group->enemies[i].matrixPos.row == player->matrixPos.row && 
+            group->enemies[i].matrixPos.column == player->matrixPos.column) 
+        {
+            return true; // Retorna verdadeiro se encontrou colisão
+        }
+    }
+
+    return false; // Retorna falso se o loop terminar sem colisões
 }

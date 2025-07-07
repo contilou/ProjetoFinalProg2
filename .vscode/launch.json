@@ -1,46 +1,63 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/${config:myproject.name}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
         {
-            "name": "Debug",
-            "type": "cppdbg",
-            "request": "launch",
-            // Usa a variável do settings.json para encontrar o .exe
-            "program": "${workspaceFolder}/${config:myproject.name}.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": false
-                }
-            ],
-            "windows": {
-                "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
-            },
-            "preLaunchTask": "build debug"
-        },
-        {
-            "name": "Run",
-            "type": "cppdbg",
-            "request": "launch",
-            // Usa a variável do settings.json para encontrar o .exe
-            "program": "${workspaceFolder}/${config:myproject.name}.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "windows": {
-                 "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
-            },
-            "preLaunchTask": "build release"
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": false
         }
-    ]
+      ],
+      "windows": {
+        "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
+      },
+      "preLaunchTask": "build debug"
+    },
+    {
+      "name": "Run",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/${config:myproject.name}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "windows": {
+        "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
+      },
+      "preLaunchTask": "build release"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "f:/ProjetoFinalProg2/src",
+      "program": "f:/ProjetoFinalProg2/src/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
 }

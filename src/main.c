@@ -16,7 +16,7 @@ typedef enum GameScreen { MENU, GAMEPLAY, PAUSE} GameScreen;
 //Variaveis locais
 Camera2D camera = { 0 };
 Vector2 circlePosition = { 0 };
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0};
+tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
 tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
 char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
@@ -155,7 +155,7 @@ int main()
             sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
             sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
             sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
-            sprintf(textovida, "Vidas: X");     //Preencher apos criar o sistema de vidas
+            sprintf(textovida, "Vidas: %d", jogador.lives);     //Preencher apos criar o sistema de vidas
             sprintf(textopont, "Pontuacao: %d", jogador.score);   //Preencher apos criar o sistema de pontuacao
 
             for(int i = 0; i < 3; i++){
@@ -163,12 +163,25 @@ int main()
                     checkExplosion(i);
                 }
             }
-    
+            
+            //Se o jogador morrer
+            if (jogador.lives <= 0) {
+                //Retorna ao menu
+                currentScreen = MENU;
+                // Reinicia o estado do jogo para quando o jogador quiser jogar novamente
+                StartGame();
+            }
+
             // na transição do menu para o jogo, há um intervalo de 0.7 segundos 
             if (started){
                 WaitTime(0.3);
                 started=0;
             }
+
+            if(DamageByEnemies(&enemyGroup, &jogador)){
+                DamagePlayer(&jogador);
+            }
+            
 
             //Bloco de código temporário, enquanto não fiz a interação da bomba com a Parede destrutivel
             if(IsKeyPressed(KEY_P)){
@@ -227,6 +240,13 @@ void checkExplosion(int bombIndex){
 
         if(explosionPos.row == -1){
             continue;
+        }
+
+        //Se a explosão atingiu o jogador, aplica o dano.
+        if (explosionPos.row == jogador.matrixPos.row && explosionPos.column == jogador.matrixPos.column) {
+            DamagePlayer(&jogador);
+            // Não é necessário continuar verificando esta explosão, pois o dano já foi aplicado
+            // e o jogador está invencível por um curto período.
         }
 
         switch (mapa.matrix[explosionPos.row][explosionPos.column]){
@@ -289,6 +309,11 @@ int StartGame(){
         return 0;
     }
     GetPlayerStartPos(&jogador, &mapa);
+    //Reseta as vidas e o estado do jogador pq ele pode ter morrido em outro save.
+    jogador.lives = 3;
+    jogador.score = 0;
+    jogador.is_invincible = false;
+    jogador.invincibility_timer = 0;
     InitEnemies(&enemyGroup, &mapa);
     InitBoxes(&boxGroup, &mapa);
     InitWallD(&wallDGroup, &mapa);
