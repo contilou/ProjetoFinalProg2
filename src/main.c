@@ -25,6 +25,7 @@ tBoxGroup boxGroup;
 tWallDGroup wallDGroup;
 int started = 0;
 double startPauseTime;
+AudioManager audio;
 
 typedef struct{
     tMap map;
@@ -51,6 +52,7 @@ int main()
     const int screenWidth = 1200;
     const int screenHeight = 600;
 
+    audio = Carregasom();
 
     InitWindow(screenWidth, screenHeight, "raylib");
     ClearBackground(RAYWHITE);
@@ -65,15 +67,21 @@ int main()
     mapa = mapas[0];
 
     if (!StartGame(&mapa)) return 1;
-    
-    AudioManager audio = Carregasom();
+    Music musicamenu = LoadMusicStream("audio/musica.mp3");
+    SetMusicVolume(musicamenu, 0.8);
 
     GameScreen currentScreen = MENU;
 
     while(!WindowShouldClose()){
         // Menu inicial
+        UpdateMusicStream(musicamenu);
         if(currentScreen==MENU){
+            if (!IsMusicStreamPlaying(musicamenu) && !IsSoundPlaying(audio.somMorte)) {
+                PlayMusicStream(musicamenu);
+            }
             if(IsKeyPressed(KEY_ENTER)){
+                StopMusicStream(musicamenu);
+                PlaySound(audio.somStart);
                 currentScreen=GAMEPLAY;
                 started = 1;
             }
@@ -161,7 +169,7 @@ int main()
             if(jogador.keys >= 5){
                 ChangeMap(mapas, &mapa);//Passa de nível quando o jogador pega 5 chaves
             }
-            MovePlayer(&jogador, &mapa); //Move o jogador
+            MovePlayer(&jogador, &mapa, audio); //Move o jogador
             float dt = GetFrameTime();
             UpdateEnemies(&enemyGroup, dt, &mapa);
             CheckKey(&boxGroup, &mapa);
@@ -184,6 +192,7 @@ int main()
             //Se o jogador morrer
             if (jogador.lives <= 0) {
                 //Retorna ao menu
+                PlaySound(audio.somMorte);
                 currentScreen = MENU;
                 // Reinicia o estado do jogo para quando o jogador quiser jogar novamente
                 if(InitMaps(&mapas, &num_maps) != 0){
@@ -222,6 +231,7 @@ int main()
     FreeWallD(&wallDGroup);
     FreeEnemies(&enemyGroup);
     Eliminasom(audio);
+    UnloadMusicStream(musicamenu);
     CloseWindow();                  // Fecha a janela
 
 
@@ -358,11 +368,9 @@ void descontaTempo(){
 
 void ChangeMap(tMap maps[], tMap *current_map){
     int next_map_index = current_map->mapId;
-    
+    PlaySound(audio.somNext_Map);
     *current_map = maps[next_map_index];
 
     StartGame(current_map);
 
 }
-
-

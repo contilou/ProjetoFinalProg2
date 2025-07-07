@@ -15,7 +15,7 @@ void explosionEffect(tBomb *bomb, tMap *mapa, int index){
 
 // checa se isPlanted[i] é true, e se a diferença de tempo desde que foi plantada é menor do que 3 (planted_times[i]).
 // enquanto ambos forem verdadeiros, o retângulo vermelho será desenhado na posição positions[i].
-void PlantBomb(tBomb *bomb, tMap *mapa){
+void PlantBomb(tBomb *bomb, tMap *mapa, AudioManager audio){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true){
             if(GetTime()-bomb->planted_times[i]<3){
@@ -25,6 +25,7 @@ void PlantBomb(tBomb *bomb, tMap *mapa){
                 bomb->exploded[i]=true;
                 bomb->bombsLeft++;
                 bomb->isPlanted[i]=false;
+                PlaySound(audio.somExplosion);
                 if (GetTime() - bomb->explosion_times[i]<1.5){
                     explosionEffect(bomb, mapa, i);
                 }
@@ -53,7 +54,7 @@ int total_planted = 0;
 
 // Finalmente, uma bomba a menos estará disponível para ser usada. 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
-    PlantBomb(bomb, map);
+    PlantBomb(bomb, map, audio);
     if (bomb->bombsLeft==0)return;
     if (IsKeyPressed(KEY_B)){
         tMapPos vector;
@@ -62,7 +63,6 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         if (map->matrix[vector.row][vector.column]!=' '){
             return;
         }
-        
         PlaySound(audio.somBomba);
         int current = total_planted%3;
         bomb->exploded[current] = false;

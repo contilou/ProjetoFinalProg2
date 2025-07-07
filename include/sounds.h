@@ -6,6 +6,11 @@
 
 typedef struct {
     Sound somBomba;
+    Sound somExplosion;
+    Sound somStart;
+    Sound somMorte;
+    Sound somNext_Map;
+    Sound somChave;
 } AudioManager;
 AudioManager Carregasom(void);
 void Eliminasom(AudioManager som);

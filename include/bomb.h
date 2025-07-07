@@ -19,7 +19,7 @@ typedef struct{
 } tBomb;
 
 void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio);
-void PlantBomb(tBomb *bomb, tMap *mapa);
+void PlantBomb(tBomb *bomb, tMap *mapa, AudioManager audio);
 void resetBombInfo(tBomb *bomb);
 
 #endif

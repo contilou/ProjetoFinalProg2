@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include "map.h"
 #include "enemy.h"
+#include "sounds.h"
 
 typedef enum {IDLE, MOVING} pState; //Declara um enum com estados possíveis para o jogador
 
@@ -34,7 +35,7 @@ typedef struct {
 
 //Declaração das funções
 void GetPlayerStartPos(tPlayer *player, tMap *map);
-void MovePlayer(tPlayer *player, tMap* map);
+void MovePlayer(tPlayer *player, tMap *map, AudioManager audio);
 void DrawPlayer(tPlayer *player, tMap* map);
 void ChangeScore(tPlayer *player, int score);
 bool isElementSolid(char elem);

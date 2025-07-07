@@ -2,6 +2,7 @@
 #include <math.h>
 #include "player.h"
 #include "enemy.h"
+#include "sounds.h"
 
 //Percorre a matriz do mapa e, após achar a posição inicial do jogador, armazenas na propriedades matrixPos e screenPos
 void GetPlayerStartPos(tPlayer *player, tMap *map){
@@ -25,8 +26,15 @@ void GetPlayerStartPos(tPlayer *player, tMap *map){
 }
 
 //Move o jogador utilizando WASD ou as setas do teclado
-void MovePlayer(tPlayer *player, tMap *map){
+void MovePlayer(tPlayer *player, tMap *map, AudioManager audio){
 
+    //Sistema para sempre verificar e mover o jogador enquanto ele estiver invencível
+    if (player->is_invincible) {
+        player->invincibility_timer -= GetFrameTime();
+        if (player->invincibility_timer <= 0) {
+            player->is_invincible = false;
+        }
+    }
     
     //Roda apenas se o jogador não estiver se movendo
     if(player->state == IDLE){
@@ -81,7 +89,9 @@ void MovePlayer(tPlayer *player, tMap *map){
             player->matrixPos.column += goal_direction.x;
             if(map->matrix[player->matrixPos.row][player->matrixPos.column] == 'C'){
                 map->matrix[player->matrixPos.row][player->matrixPos.column] = 'J';
+                PlaySound(audio.somChave);
                 player->keys++;
+                
             }
             player->state = MOVING;
             player->direction = goal_direction;
@@ -108,13 +118,6 @@ void MovePlayer(tPlayer *player, tMap *map){
         }
     }
 
-    //Sistema para sempre verificar e mover o jogador enquanto ele estiver invencível
-    if (player->is_invincible) {
-        player->invincibility_timer -= GetFrameTime();
-        if (player->invincibility_timer <= 0) {
-            player->is_invincible = false;
-        }
-    }
     
 }
 

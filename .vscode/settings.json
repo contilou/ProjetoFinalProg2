@@ -72,6 +72,7 @@
     "raylib.h": "c",
     "sounds.h": "c",
     "map.h": "c",
-    "player.h": "c"
+    "player.h": "c",
+    "stdio.h": "c"
   }
 }
