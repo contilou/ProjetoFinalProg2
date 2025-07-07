@@ -16,6 +16,7 @@ AudioManager Carregasom(void) {
     audio.somChave = LoadSound("audio/chave.wav");
     SetSoundVolume(audio.somExplosion, 0.1);
     SetSoundVolume(audio.somChave, 0.1);
+    SetSoundVolume(audio.somMorte, 0.4);
     // Verificação para ver se os audios foram corretamentes carregados
     if (audio.somBomba.stream.buffer == NULL) TraceLog(LOG_WARNING, "AUDIO: Falha ao carregar 'bomba.wav'");
     if (audio.somExplosion.stream.buffer == NULL) TraceLog(LOG_WARNING, "AUDIO: Falha ao carregar 'explosion.wav'");
