@@ -65,6 +65,7 @@ void BombsManager(tPlayer *player, tMap *map, tBomb *bomb, AudioManager audio){
         
         PlaySound(audio.somBomba);
         int current = total_planted%3;
+        bomb->exploded[current] = false;
         bomb->isPlanted[current] = true;
         bomb->positions[current] = vector;
         bomb->planted_times[current] = GetTime();

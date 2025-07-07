@@ -1,19 +1,12 @@
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "map.h"
 #include "player.h"
 
 //Abre o arquivo de texto com o mapa e o preenche na matriz do mapa
-int GetMapMatrix(tMap *map){
-
-    FILE* map_text;
-    map_text = fopen(map->file_name, "r"); //Realiza a abertura do documento contendo o mapa em formato de texto
-
-    //Verifica se o arquivo foi aberto corretamente
-    if(map_text == NULL){
-        return 0;
-    }
+int GetMapMatrix(tMap *map, FILE *map_text){
 
     //Inicializa a matriz do mapa-------------
     map->matrix = (char**) malloc(map->rows * sizeof(char*));
@@ -69,3 +62,44 @@ void DrawWalls(tMap* map){
         }
     }
  }
+
+int InitMaps(tMap **maps, int *num_maps){
+
+    FILE *map_text;
+    int count = 1;   
+    
+    *maps = (tMap *) malloc(2 * sizeof(tMap));
+    
+    if (*maps == NULL)
+    {
+        return -1;
+    }
+    
+    while (true) 
+    {
+        
+        char current_file[17];
+        snprintf(current_file, 17, "%s%d%s", "maps/mapa", count, ".txt");
+        map_text = fopen(current_file, "r");
+
+        if(map_text == NULL){
+            break;
+        } 
+
+
+
+        *maps = (tMap *) realloc(*maps, sizeof(tMap) * count );
+        (*maps)[count - 1] = (tMap){current_file, NULL, count, 25, 60, 20};
+
+        if(GetMapMatrix(&(*maps)[count - 1], map_text) != 1){
+            return -1;
+        }
+        
+        fclose(map_text);
+        count++;
+    }
+    *num_maps = count;
+
+    return 0;
+} 
+

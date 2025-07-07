@@ -51,12 +51,12 @@ void MovePlayer(tPlayer *player, tMap *map){
                 goal_direction.x = move_direction.x;
                 player->horizontal_priority = false;
 
-
             }
             // caso contrário, tentara o vertical
             else if (move_direction.y != 0 && !isElementSolid(map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column])) {
                 goal_direction.y = move_direction.y;
                 player->horizontal_priority = true;
+                
             }
 
         } else {
@@ -64,7 +64,6 @@ void MovePlayer(tPlayer *player, tMap *map){
             if (move_direction.y != 0 && !isElementSolid(map->matrix[player->matrixPos.row + (int)move_direction.y][player->matrixPos.column])){
                 goal_direction.y = move_direction.y;
                 player->horizontal_priority = true;
-
             }
             // Caso contrário, tentara o horizontal
             else if (move_direction.x != 0 && !isElementSolid(map->matrix[player->matrixPos.row][player->matrixPos.column + (int)move_direction.x])) {
@@ -75,10 +74,15 @@ void MovePlayer(tPlayer *player, tMap *map){
 
         // Realiza o movimento com base na direção
         if (goal_direction.x != 0 || goal_direction.y != 0) {
-            map->matrix[player->matrixPos.row][player->matrixPos.column] = ' ';
+            if(map->matrix[player->matrixPos.row][player->matrixPos.column] == 'J'){
+                map->matrix[player->matrixPos.row][player->matrixPos.column] = ' ';
+            }
             player->matrixPos.row += goal_direction.y;
             player->matrixPos.column += goal_direction.x;
-            map->matrix[player->matrixPos.row][player->matrixPos.column] = 'J';
+            if(map->matrix[player->matrixPos.row][player->matrixPos.column] == 'C'){
+                map->matrix[player->matrixPos.row][player->matrixPos.column] = 'J';
+                player->keys++;
+            }
             player->state = MOVING;
             player->direction = goal_direction;
         }
@@ -117,19 +121,14 @@ void MovePlayer(tPlayer *player, tMap *map){
 bool isElementSolid(char elem){
 
     switch (elem) {
-        case 'W': 
-        case 'B': 
-        case 'K': 
-        case 'E':
-        case 'D': 
-        case 'b':
-            return true;
-        default:
+        case 'C': 
+        case ' ': 
             return false;
+        default:
+            return true;
     }
 
 }
-
 void ChangeScore(tPlayer *player, int score){
     player->score += score;
     player->score = (player->score < 0) ? 0 : player->score;

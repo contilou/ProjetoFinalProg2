@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include "map.h"
 #include "enemy.h"
+
 typedef enum {IDLE, MOVING} pState; //Declara um enum com estados possíveis para o jogador
 
 
@@ -18,11 +19,10 @@ typedef struct {
     float speed; //Velocidade do jogador
     pState state; //Estado do jogador
 
-    int score;
-    int bombsLeft;
-
-    int keys;
-
+    int score; //Pontuação
+    int bombsLeft; //Bombas restantes
+    
+    int keys; //Chaves obtidas pelo jogador
     int lives;
     bool is_invincible;
     float invincibility_timer;
@@ -39,4 +39,5 @@ void ChangeScore(tPlayer *player, int score);
 bool isElementSolid(char elem);
 void DamagePlayer(tPlayer *player);
 bool DamageByEnemies(EnemyGroup *group, tPlayer *player);
+
 #endif

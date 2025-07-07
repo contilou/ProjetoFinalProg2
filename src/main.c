@@ -14,11 +14,11 @@
 typedef enum GameScreen { MENU, GAMEPLAY, PAUSE} GameScreen;
 
 //Variaveis locais
-Camera2D camera = { 0 };
-Vector2 circlePosition = { 0 };
 tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
-tMap mapa = {"mapa1.txt", NULL, 1, 25, 60, 20};
-char texto[60], texto2[60], textobomba[10],textovida[10],textopont[30];
+tMap mapa;
+tMap *mapas = NULL;
+int num_maps = 0;
+char texto_xy[60], texto_matriz[60], textobomba[10],textovida[10],textopont[30], textochave[30], textonivel[30];
 tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}};
 EnemyGroup enemyGroup;
 tBoxGroup boxGroup;
@@ -39,12 +39,11 @@ typedef struct{
 //Funções locais
 void UpdateDrawFrame(void);   // Atualiza e desenha um frame
 void checkExplosion(int bombIndex);
-
 int SaveGame();               // Salva o Jogo
-int StartGame();              // começa o jogo do 0
+int StartGame(tMap *map);              // começa o jogo do 0
 int LoadGame();               // carrega os dados do último jogo nas variáveis locais 
 void descontaTempo();         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
-
+void ChangeMap(tMap maps[], tMap *current_map);
 
 int main()
 {
@@ -57,9 +56,13 @@ int main()
     ClearBackground(RAYWHITE);
     SetTargetFPS(60);               // Executa jogo para 60 frames por segundo
 
-    if (!StartGame()) return 1;
+    if(InitMaps(&mapas, &num_maps) != 0){
+        return 1;
+    }
+    mapa = mapas[0];
+
+    if (!StartGame(&mapa)) return 1;
     
-    camera.target = (Vector2){0.0f, 0.0f};
     AudioManager audio = Carregasom();
 
     GameScreen currentScreen = MENU;
@@ -89,7 +92,12 @@ int main()
             ClearBackground(DARKBLUE);
             // N apra iniciar novo jogo
             if (IsKeyPressed(KEY_N)){
-                if (!StartGame()) return 1;
+                if(InitMaps(&mapas, &num_maps) != 0){
+                    return 1;
+                }
+                jogador.score = 0;
+                mapa = mapas[0];
+                if (!StartGame(&mapa)) return 1;
                 descontaTempo();
                 currentScreen = GAMEPLAY;    
             }
@@ -147,16 +155,22 @@ int main()
             ClearBackground(RAYWHITE);
             UpdateDrawFrame();
             BombsManager(&jogador, &mapa, &bomba, audio);
+            if(jogador.keys >= 5){
+                ChangeMap(mapas, &mapa);//Passa de nível quando o jogador pega 5 chaves
+            }
             MovePlayer(&jogador, &mapa); //Move o jogador
             float dt = GetFrameTime();
             UpdateEnemies(&enemyGroup, dt, &mapa);
             CheckKey(&boxGroup, &mapa);
 
-            sprintf(texto, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
-            sprintf(texto2, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
-            sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Preencher apos criar o sistema de bombas
+
+            sprintf(texto_xy, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
+            sprintf(texto_matriz, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
+            sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Indicador de bombas restantes
             sprintf(textovida, "Vidas: %d", jogador.lives);     //Preencher apos criar o sistema de vidas
-            sprintf(textopont, "Pontuacao: %d", jogador.score);   //Preencher apos criar o sistema de pontuacao
+            sprintf(textopont, "Pontuacao: %d", jogador.score);   //Indicador de posição
+            sprintf(textonivel, "Nivel %d", mapa.mapId);
+            sprintf(textochave, "Chaves: %d/5", jogador.keys); // Subsituir pelo sprite da chave dps
 
             for(int i = 0; i < 3; i++){
                 if(bomba.exploded[i]){
@@ -169,7 +183,12 @@ int main()
                 //Retorna ao menu
                 currentScreen = MENU;
                 // Reinicia o estado do jogo para quando o jogador quiser jogar novamente
-                StartGame();
+                if(InitMaps(&mapas, &num_maps) != 0){
+                    return 1;
+                }
+                mapa = mapas[0];
+
+                if (!StartGame(&mapa)) return 1;
             }
 
             // na transição do menu para o jogo, há um intervalo de 0.7 segundos 
@@ -195,7 +214,7 @@ int main()
         } 
     }
  
-
+    FreeWallD(&wallDGroup);
     FreeEnemies(&enemyGroup);
     Eliminasom(audio);
     CloseWindow();                  // Fecha a janela
@@ -224,11 +243,13 @@ void UpdateDrawFrame(void)
 
         //EndMode2D();
 
-        DrawText(texto, 10, 15, 20, WHITE);
-        DrawText(texto2, 350, 15, 20, WHITE);
-        DrawText(textobomba, 20,500,20, BLACK);
-        DrawText(textovida, 400,500,20, BLACK);
-        DrawText(textopont, 800,500,20, BLACK);
+        DrawText(texto_xy, 10, 15, 20, WHITE);
+        DrawText(texto_matriz, 350, 15, 20, WHITE);
+        DrawText(textonivel, 70,540,20, BLACK);
+        DrawText(textovida, 302,540,20, BLACK);
+        DrawText(textobomba, 534,540,20, BLACK);
+        DrawText(textopont, 766,540,20, BLACK);
+        DrawText(textochave, 998,540,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
 }
@@ -303,21 +324,17 @@ int LoadGame(){
 }
 
 // Inicia o jogo do 0. Retorna 0 caso um erro ocorra.
-int StartGame(){
+int StartGame(tMap *map){
     resetBombInfo(&bomba);
-    if(GetMapMatrix(&mapa) != 1){
-        return 0;
-    }
-    GetPlayerStartPos(&jogador, &mapa);
-    //Reseta as vidas e o estado do jogador pq ele pode ter morrido em outro save.
+    jogador = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
     jogador.lives = 3;
     jogador.score = 0;
     jogador.is_invincible = false;
     jogador.invincibility_timer = 0;
-    InitEnemies(&enemyGroup, &mapa);
-    InitBoxes(&boxGroup, &mapa);
-    InitWallD(&wallDGroup, &mapa);
-    camera.target = (Vector2){0.0f, 0.0f};
+    GetPlayerStartPos(&jogador, map);
+    InitEnemies(&enemyGroup, map);
+    InitBoxes(&boxGroup, map);
+    InitWallD(&wallDGroup, map);
     return 1;
 }
 
@@ -333,5 +350,13 @@ void descontaTempo(){
     }
 }
 
+void ChangeMap(tMap maps[], tMap *current_map){
+    int next_map_index = current_map->mapId;
+    
+    *current_map = maps[next_map_index];
+
+    StartGame(current_map);
+
+}
 
 
