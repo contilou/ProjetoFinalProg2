@@ -39,7 +39,7 @@ void MovePlayer(tPlayer *player, tMap *map, AudioManager audio);
 void DrawPlayer(tPlayer *player, tMap* map);
 void ChangeScore(tPlayer *player, int score);
 bool isElementSolid(char elem);
-void DamagePlayer(tPlayer *player);
+void DamagePlayer(tPlayer *player, AudioManager audio);
 bool DamageByEnemies(EnemyGroup *group, tPlayer *player);
 
 #endif

@@ -11,6 +11,7 @@ typedef struct {
     Sound somMorte;
     Sound somNext_Map;
     Sound somChave;
+    Sound somDano;
 } AudioManager;
 AudioManager Carregasom(void);
 void Eliminasom(AudioManager som);

@@ -14,6 +14,7 @@ AudioManager Carregasom(void) {
     audio.somMorte = LoadSound("audio/morte.wav");
     audio.somNext_Map = LoadSound("audio/next_map.wav");
     audio.somChave = LoadSound("audio/chave.wav");
+    audio.somDano = LoadSound("audio/dano.wav");
     SetSoundVolume(audio.somExplosion, 0.1);
     SetSoundVolume(audio.somChave, 0.1);
     SetSoundVolume(audio.somMorte, 0.4);

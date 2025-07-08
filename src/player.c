@@ -154,8 +154,9 @@ void DrawPlayer(tPlayer *player, tMap *map){
 }
 
 //Aplica dano ao jogador e torna ele invencível por um tempo.
-void DamagePlayer(tPlayer *player){
+void DamagePlayer(tPlayer *player, AudioManager audio){
     if (!player->is_invincible) {
+        PlaySound(audio.somDano);
         player->lives--;
         player->is_invincible = true;
         player->invincibility_timer = 1.5f; // 1.5 segundos de invencibilidade

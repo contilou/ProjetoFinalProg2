@@ -210,7 +210,7 @@ int main()
             }
 
             if(DamageByEnemies(&enemyGroup, &jogador)){
-                DamagePlayer(&jogador);
+                DamagePlayer(&jogador, audio);
             }
             
 
@@ -281,7 +281,7 @@ void checkExplosion(int bombIndex){
 
         //Se a explosão atingiu o jogador, aplica o dano.
         if (explosionPos.row == jogador.matrixPos.row && explosionPos.column == jogador.matrixPos.column) {
-            DamagePlayer(&jogador);
+            DamagePlayer(&jogador, audio);
             // Não é necessário continuar verificando esta explosão, pois o dano já foi aplicado
             // e o jogador está invencível por um curto período.
         }
