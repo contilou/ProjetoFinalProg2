@@ -67,20 +67,18 @@ int main()
     mapa = mapas[0];
 
     if (!StartGame(&mapa)) return 1;
-    Music musicamenu = LoadMusicStream("audio/musica.mp3");
-    SetMusicVolume(musicamenu, 0.8);
 
     GameScreen currentScreen = MENU;
 
     while(!WindowShouldClose()){
         // Menu inicial
-        UpdateMusicStream(musicamenu);
+        UpdateMusicStream(audio.musicaMenu);
         if(currentScreen==MENU){
-            if (!IsMusicStreamPlaying(musicamenu) && !IsSoundPlaying(audio.somMorte)) {
-                PlayMusicStream(musicamenu);
+            if (!IsMusicStreamPlaying(audio.musicaMenu) && !IsSoundPlaying(audio.somMorte)) {
+                PlayMusicStream(audio.musicaMenu);
             }
             if(IsKeyPressed(KEY_ENTER)){
-                StopMusicStream(musicamenu);
+                StopMusicStream(audio.musicaMenu);
                 PlaySound(audio.somStart);
                 currentScreen=GAMEPLAY;
                 started = 1;
@@ -101,8 +99,14 @@ int main()
         else if(currentScreen==PAUSE){
             BeginDrawing();
             ClearBackground(DARKBLUE);
+            UpdateMusicStream(audio.musicaPausa);
+            if (!IsMusicStreamPlaying(audio.musicaPausa)){
+                PlayMusicStream(audio.musicaPausa);
+            }
             // N apra iniciar novo jogo
             if (IsKeyPressed(KEY_N)){
+                StopMusicStream(audio.musicaPausa);
+                PlaySound(audio.somStart);
                 if(InitMaps(&mapas, &num_maps) != 0){
                     return 1;
                 }
@@ -114,6 +118,7 @@ int main()
             }
             // C para carregar jogo salvo
             if (IsKeyPressed(KEY_C)) {
+                StopMusicStream(audio.musicaPausa);
                 if(!LoadGame()){
                     BeginDrawing();
                     ClearBackground(DARKBLUE);
@@ -126,6 +131,8 @@ int main()
             }
             // S para salvar o progresso atul
             if (IsKeyPressed(KEY_S)) {
+                StopMusicStream(audio.musicaPausa);
+                PlaySound(audio.somBotao);
                 if(SaveGame()){
                     BeginDrawing();
                     ClearBackground(DARKBLUE);
@@ -143,9 +150,13 @@ int main()
                 currentScreen = PAUSE;
             }
             // Q para sair
-            if (IsKeyPressed(KEY_Q)) break;
+            if (IsKeyPressed(KEY_Q)){
+                StopMusicStream(audio.musicaPausa);
+                break;
+            }
             // V para despausar
             if (IsKeyPressed(KEY_V)) {   
+                StopMusicStream(audio.musicaPausa);
                 descontaTempo();
                 currentScreen = GAMEPLAY;
             }
@@ -230,8 +241,7 @@ int main()
     FreeBoxGroup(&boxGroup);
     FreeWallD(&wallDGroup);
     FreeEnemies(&enemyGroup);
-    Eliminasom(audio);
-    UnloadMusicStream(musicamenu);
+    EliminaAudio(audio);
     CloseWindow();                  // Fecha a janela
 
 

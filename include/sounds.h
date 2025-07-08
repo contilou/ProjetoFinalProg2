@@ -12,8 +12,11 @@ typedef struct {
     Sound somNext_Map;
     Sound somChave;
     Sound somDano;
+    Sound somBotao;
+    Music musicaMenu;
+    Music musicaPausa;
 } AudioManager;
 AudioManager Carregasom(void);
-void Eliminasom(AudioManager som);
+void EliminaAudio(AudioManager som);
 
 #endif

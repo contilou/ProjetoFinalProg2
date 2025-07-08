@@ -15,9 +15,15 @@ AudioManager Carregasom(void) {
     audio.somNext_Map = LoadSound("audio/next_map.wav");
     audio.somChave = LoadSound("audio/chave.wav");
     audio.somDano = LoadSound("audio/dano.wav");
+    audio.somBotao = LoadSound("audio/botao.wav");
+    audio.musicaMenu = LoadMusicStream("audio/menu.mp3");
+    audio.musicaPausa = LoadMusicStream("audio/pausa.mp3");
+
+    SetMusicVolume(audio.musicaMenu, 0.8);
     SetSoundVolume(audio.somExplosion, 0.1);
     SetSoundVolume(audio.somChave, 0.1);
     SetSoundVolume(audio.somMorte, 0.4);
+    SetSoundVolume(audio.somBotao, 0.3);
     // Verificação para ver se os audios foram corretamentes carregados
     if (audio.somBomba.stream.buffer == NULL) TraceLog(LOG_WARNING, "AUDIO: Falha ao carregar 'bomba.wav'");
     if (audio.somExplosion.stream.buffer == NULL) TraceLog(LOG_WARNING, "AUDIO: Falha ao carregar 'explosion.wav'");
@@ -25,10 +31,18 @@ AudioManager Carregasom(void) {
     return audio; // Retorna a struct com todos os sons carregados
 }
 
-void Eliminasom(AudioManager audio) {
+void EliminaAudio(AudioManager audio) {
     UnloadSound(audio.somBomba);
     UnloadSound(audio.somExplosion);
+    UnloadSound(audio.somStart);
+    UnloadSound(audio.somMorte);
+    UnloadSound(audio.somNext_Map);
+    UnloadSound(audio.somChave);
+    UnloadSound(audio.somDano);
+    UnloadSound(audio.somBotao);
     // UnloadSound(audio.musicaMenu);
 
+    UnloadMusicStream(audio.musicaMenu);
+    UnloadMusicStream(audio.musicaPausa);
     CloseAudioDevice(); // Fecha o dispositivo de áudio
 }
