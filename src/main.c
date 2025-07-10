@@ -244,6 +244,12 @@ int main()
         } 
     }
 
+
+    UnloadTexture(game_elements.map.wall_sprite);
+    UnloadTexture(game_elements.maps->wall_sprite);
+    UnloadTexture(game_elements.wallDGroup.walld_sprite);
+    UnloadTexture(game_elements.boxGroup.box_sprite);
+    UnloadTexture(game_elements.boxGroup.key_sprite);
     UnloadTexture(game_elements.enemyGroup.enemy_sprite);
     UnloadTexture(game_elements.bomb.sprite);
     UnloadTexture(game_elements.bomb.explosion_tilemap);
@@ -362,9 +368,13 @@ int StartGame(tElements *game_elements){
     game_elements->player.is_invincible = false;
     game_elements->player.invincibility_timer = 0;
     GetPlayerStartPos(&game_elements->player, &game_elements->map);
-    InitEnemies(&game_elements->enemyGroup, &game_elements->map);
-    InitBoxes(&game_elements->boxGroup, &game_elements->map);
-    InitWallD(&game_elements->wallDGroup, &game_elements->map);
+    
+    // Se ocorrer um erro em qualquer uma das inicializacoes a funcao retornara 0
+    if ((InitEnemies(&game_elements->enemyGroup, &game_elements->map)) !=1 ||
+    (InitBoxes(&game_elements->boxGroup, &game_elements->map)) !=1 ||
+    (InitWallD(&game_elements->wallDGroup, &game_elements->map)) !=1) {
+       return 0;
+    }
     return 1;
 }
 

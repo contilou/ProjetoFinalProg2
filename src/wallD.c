@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void InitWallD(tWallDGroup *group, tMap *map){
+int InitWallD(tWallDGroup *group, tMap *map){
     
     int total = 0;
     Texture2D walld_sprite_aux = LoadTexture("sprites/parededestrutivel.png");
@@ -21,7 +21,7 @@ void InitWallD(tWallDGroup *group, tMap *map){
     group->WallD = (tWallD*) malloc(sizeof(tWallD) * total);
 
     if (group->WallD == NULL) {
-        exit(EXIT_FAILURE); 
+        return 0; 
     }
 
     int k = 0;
@@ -36,6 +36,7 @@ void InitWallD(tWallDGroup *group, tMap *map){
             }
         }
     }
+    return 1;
 }
 
 void DestroyWallD(tWallDGroup *group, tMapPos target_position, tMap *map){

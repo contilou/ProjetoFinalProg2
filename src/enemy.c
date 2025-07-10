@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "enemy.h"
 
-void InitEnemies(EnemyGroup *group, tMap *map) {
+int InitEnemies(EnemyGroup *group, tMap *map) {
     
     int totalEnemies = 0;
     Texture2D enemy_sprite_aux = LoadTexture("sprites/gotinha.png");
@@ -16,6 +16,12 @@ void InitEnemies(EnemyGroup *group, tMap *map) {
     // Aloca memória para os inimigos
     group->count = totalEnemies;
     group->enemies = malloc(sizeof(Enemy) * totalEnemies);
+    
+    if (group->enemies == NULL)
+    {
+        return 0;
+    }
+    
 
     // Inicializa os inimigos no mapa 
     int k = 0;
@@ -34,6 +40,7 @@ void InitEnemies(EnemyGroup *group, tMap *map) {
             }
         }
     }
+    return 1;
 }
 
 void UpdateEnemies(EnemyGroup *group, float speed, tMap *map) {

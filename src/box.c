@@ -1,7 +1,7 @@
 #include "box.h"
 #include <stdlib.h>
 
-void InitBoxes(tBoxGroup *group, tMap *map) {
+int InitBoxes(tBoxGroup *group, tMap *map) {
 
     int total = 0;
     group->key_count = 0;
@@ -27,6 +27,16 @@ void InitBoxes(tBoxGroup *group, tMap *map) {
     group->boxes = (tBox*) malloc(sizeof(tBox) * total);
     group->keys = (tKey*) malloc(sizeof(tKey) * group->key_count);
 
+    // Verifica se a alocacao de memoria foi feita corretamente para as caixas
+    if (group->boxes == NULL){
+        return 0;
+    }
+    
+    // Realiza a mesma verificacao de erro para as chaves 
+    if (group->keys == NULL){
+        return 0;
+    }
+
     for(int i = 0; i < group->key_count; i++){
         group->keys[i].unlocked = false;
         group->key_sprite = key_sprite_aux;
@@ -46,20 +56,17 @@ void InitBoxes(tBoxGroup *group, tMap *map) {
             }
         }
     }
+    return 1;
 }
 
 void DrawBoxes(tBoxGroup *group, tMap *map){
-
 
     for(int i = 0; i < group->box_count; i++){
         tBox *currentBox = &group->boxes[i];
         if(!currentBox->destroyed) {
             DrawTexture(group->box_sprite, currentBox->matrixPos.column * map->tile_size, currentBox->matrixPos.row * map->tile_size, WHITE);
         }
-
     }
-
-
 }
 
 void DrawKeys(tBoxGroup *group, tMap *map){

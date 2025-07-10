@@ -20,7 +20,7 @@ typedef struct {
     
 } tWallDGroup;
 
-void InitWallD(tWallDGroup *group, tMap *map);
+int InitWallD(tWallDGroup *group, tMap *map);
 void DestroyWallD(tWallDGroup *group, tMapPos target_position, tMap *map);
 void DrawWallsD(tWallDGroup *group, tMap *map);
 void FreeWallD(tWallDGroup *group);

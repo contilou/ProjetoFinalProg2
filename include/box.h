@@ -32,7 +32,7 @@ typedef struct {
 
 } tBoxGroup;
 
-void InitBoxes(tBoxGroup *group, tMap *map);
+int InitBoxes(tBoxGroup *group, tMap *map);
 void DrawBoxes(tBoxGroup *group, tMap *map);
 void DrawKeys(tBoxGroup *group, tMap *map);
 void DestroyBox(tBoxGroup *group, tMapPos target_position, tMap *map);

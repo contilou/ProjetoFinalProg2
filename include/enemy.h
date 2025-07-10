@@ -23,7 +23,7 @@ typedef struct {
 
 } EnemyGroup;
 
-void InitEnemies(EnemyGroup *group, tMap *map);
+int InitEnemies(EnemyGroup *group, tMap *map);
 void UpdateEnemies(EnemyGroup *group, float dt, tMap *map);
 void DrawEnemies(EnemyGroup *group, tMap *map);
 void FreeEnemies(EnemyGroup *group);
