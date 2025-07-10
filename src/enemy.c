@@ -33,7 +33,7 @@ int InitEnemies(EnemyGroup *group, tMap *map) {
                 e->matrixPos.column = j;
                 e->screenPos.x      = j * map->tile_size;
                 e->screenPos.y      = i * map->tile_size;
-                e->speed            = 0.0f;
+                e->speed            = 1.0f;
                 e->timerDireção     = 0;
                 e->isAlive = true;
                 map->matrix[i][j]   = ' ';
