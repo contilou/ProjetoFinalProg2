@@ -45,21 +45,6 @@ int LoadGame(tElements *game_elements);               // carrega os dados do úl
 void descontaTempo(tBomb *bomb, double startPauseTime);         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
 void ChangeMap(tElements *game_elements, AudioManager audio);
 
-void DrawCharMatrix(char **charMatrix, int rows, int cols, Font font, Color textColor) {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            // Calcula a posição X e Y para o caractere atual
-            int posX = j * 20;
-            int posY = i * 20;
-
-            // Desenha o caractere. Convertemos o char para um array de char temporário
-            // porque DrawTextEx espera um const char*.
-            char charToDraw[2] = {charMatrix[i][j], '\0'};
-            DrawTextEx(font, charToDraw, (Vector2){ (float)posX, (float)posY }, (float)20, 0, textColor);
-        }
-    }
-}
-
 int main()
 {
     //Variaveis locais
@@ -295,9 +280,7 @@ void UpdateDrawFrame(tElements *game_elements)
             DrawKeys(&game_elements->boxGroup, &game_elements->map);
             DrawPlayer(&game_elements->player, &game_elements->map);  //Desenha o jogador 
             DrawEnemies(&game_elements->enemyGroup, &game_elements->map); //Desenha os inimigos
-            DrawBoxes(&game_elements->boxGroup, &game_elements->map);
-            DrawCharMatrix(game_elements->map.matrix, game_elements->map.rows, game_elements->map.columns, GetFontDefault(), BLACK);
-            
+            DrawBoxes(&game_elements->boxGroup, &game_elements->map);            
 
         //EndMode2D();
 
