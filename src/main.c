@@ -309,6 +309,15 @@ void checkExplosion(tElements *game_elements, int bombIndex, AudioManager audio)
             // e o jogador está invencível por um curto período.
         }
 
+        for (int e = 0; e < game_elements->enemyGroup.count; e++) {
+            if (!game_elements->enemyGroup.enemies[e].isAlive) continue;
+            if (game_elements->enemyGroup.enemies[e].matrixPos.row == explosionPos.row &&
+                game_elements->enemyGroup.enemies[e].matrixPos.column == explosionPos.column) {
+                game_elements->enemyGroup.enemies[e].isAlive = false;
+                break; 
+            }
+        }
+
         switch (game_elements->map.matrix[explosionPos.row][explosionPos.column]){
             case 'K':
             case 'B':

@@ -35,6 +35,7 @@ int InitEnemies(EnemyGroup *group, tMap *map) {
                 e->screenPos.y      = i * map->tile_size;
                 e->speed            = 1.0f;
                 e->timerDireção     = 0;
+                e->isAlive = true;
                 map->matrix[i][j]   = ' ';
                 group->enemy_sprite = enemy_sprite_aux; 
             }
@@ -55,7 +56,7 @@ void UpdateEnemies(EnemyGroup *group, float speed, tMap *map) {
     // Escolhe uma nova direção aleatoriamente
     for (int i = 0; i < group->count; i++) {
         Enemy *e = &group->enemies[i];
-
+        if (!e->isAlive) continue;
         if (e->timerDireção <= 0) {
             int d = rand() % 4;
             if      (d == 0) { e->direction = (Vector2){ 0, -1 }; }
@@ -106,6 +107,7 @@ void DrawEnemies(EnemyGroup *group, tMap *map) {
     
     for (int i = 0; i < group->count; i++) {
         Enemy *e = &group->enemies[i];
+        if (!e->isAlive) continue;
         DrawTexture(group->enemy_sprite, e->screenPos.x, e->screenPos.y, WHITE);
     }
 }
