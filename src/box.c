@@ -39,6 +39,7 @@ int InitBoxes(tBoxGroup *group, tMap *map) {
 
     for(int i = 0; i < group->key_count; i++){
         group->keys[i].unlocked = false;
+        group->keys[i].picked = false;
         group->key_sprite = key_sprite_aux;
     }
 
@@ -74,7 +75,7 @@ void DrawKeys(tBoxGroup *group, tMap *map){
 
     for(int i = 0; i < group->key_count; i++){
         tKey *currentKey = &group->keys[i];
-        if(!currentKey->picked) {
+        if(currentKey->unlocked && !currentKey->picked) {
             DrawTexture(group->key_sprite, currentKey->matrixPos.column * map->tile_size, currentKey->matrixPos.row * map->tile_size, WHITE);
         }
 
