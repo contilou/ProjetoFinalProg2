@@ -124,6 +124,7 @@ void MovePlayer(tPlayer *player, tMap *map, AudioManager audio){
 bool isElementSolid(char elem){
 
     switch (elem) {
+        case 'E':
         case 'C': 
         case ' ': 
             return false;

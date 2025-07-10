@@ -18,8 +18,9 @@ typedef struct{
     tMap map;
     tPlayer player;
     tBomb bomb;
-    // tBoxGroup boxGroup;
+    tBoxGroup boxGroup;
     EnemyGroup enemyGroup;
+    tWallDGroup tWallDGroup;
 } tGameInfo;
 
 typedef struct{
@@ -43,6 +44,21 @@ int StartGame(tElements *game_elements);              // começa o jogo do 0
 int LoadGame(tElements *game_elements);               // carrega os dados do último jogo nas variáveis locais 
 void descontaTempo(tBomb *bomb, double startPauseTime);         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
 void ChangeMap(tElements *game_elements, AudioManager audio);
+
+void DrawCharMatrix(char **charMatrix, int rows, int cols, Font font, Color textColor) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            // Calcula a posição X e Y para o caractere atual
+            int posX = j * 20;
+            int posY = i * 20;
+
+            // Desenha o caractere. Convertemos o char para um array de char temporário
+            // porque DrawTextEx espera um const char*.
+            char charToDraw[2] = {charMatrix[i][j], '\0'};
+            DrawTextEx(font, charToDraw, (Vector2){ (float)posX, (float)posY }, (float)20, 0, textColor);
+        }
+    }
+}
 
 int main()
 {
@@ -280,6 +296,7 @@ void UpdateDrawFrame(tElements *game_elements)
             DrawPlayer(&game_elements->player, &game_elements->map);  //Desenha o jogador 
             DrawEnemies(&game_elements->enemyGroup, &game_elements->map); //Desenha os inimigos
             DrawBoxes(&game_elements->boxGroup, &game_elements->map);
+            DrawCharMatrix(game_elements->map.matrix, game_elements->map.rows, game_elements->map.columns, GetFontDefault(), BLACK);
             
 
         //EndMode2D();
@@ -342,13 +359,32 @@ void checkExplosion(tElements *game_elements, int bombIndex, AudioManager audio)
 int SaveGame(tElements *game_elements){
     FILE *pfile;
     tGameInfo infos;
-    infos.map = game_elements->map;
-    infos.player = game_elements->player;
-    infos.bomb = game_elements->bomb;
-    // infos.game_elements.boxGroup = game_elements.boxGroup;
-    infos.enemyGroup = game_elements->enemyGroup;
     if (!(pfile = fopen("lastGame.dat", "wb"))) return 0;
-    fwrite(&infos, sizeof(tGameInfo), 1, pfile);
+
+    fwrite(&game_elements->player, sizeof(tPlayer), 1, pfile);
+    fwrite(&game_elements->bomb, sizeof(tBomb), 1, pfile);
+
+
+    fwrite(&game_elements->boxGroup.box_count, sizeof(int), 1, pfile);
+    fwrite(game_elements->boxGroup.boxes, sizeof(tBox), game_elements->boxGroup.box_count, pfile);
+    fwrite(&game_elements->boxGroup.key_count, sizeof(int), 1, pfile);
+    fwrite(game_elements->boxGroup.keys, sizeof(tKey), game_elements->boxGroup.key_count, pfile);
+
+
+    fwrite(&game_elements->wallDGroup.WallD_count, sizeof(int), 1, pfile);
+    fwrite(game_elements->wallDGroup.WallD, sizeof(tWallD), game_elements->wallDGroup.WallD_count, pfile);
+
+    fwrite(&game_elements->enemyGroup.count, sizeof(int), 1, pfile);
+    fwrite(game_elements->enemyGroup.enemies, sizeof(Enemy), game_elements->enemyGroup.count, pfile);
+
+    fwrite(&game_elements->map.rows, sizeof(int), 1, pfile);
+    fwrite(&game_elements->map.columns, sizeof(int), 1, pfile);
+    fwrite(&game_elements->map.mapId, sizeof(int), 1, pfile);
+    for (int i = 0; i < game_elements->map.rows; i++) {
+        fwrite(game_elements->map.matrix[i], sizeof(char), game_elements->map.columns, pfile);
+    }
+
+
     fclose(pfile);
     return 1;
 }
@@ -358,22 +394,66 @@ int LoadGame(tElements *game_elements){
     FILE *pfile;
     tGameInfo infos;
     if (!(pfile = fopen("lastGame.dat", "rb"))) return 0;
-    fread(&infos, sizeof(tGameInfo), 1, pfile);
+    
+    FreeBoxGroup(&game_elements->boxGroup);
+    FreeWallD(&game_elements->wallDGroup);
+    FreeEnemies(&game_elements->enemyGroup);
+
+    if (!StartGame(game_elements)) return 1;
+
+    //Leitura dos dados do player
+    fread(&game_elements->player, sizeof(tPlayer), 1, pfile);
+
+    //Leitura dos dados da bomba
+    fread(&game_elements->bomb, sizeof(tBomb), 1, pfile);
+
+    //Leitura dos dados da caixa
+    fread(&game_elements->boxGroup.box_count, sizeof(int), 1, pfile);
+    game_elements->boxGroup.boxes = malloc(sizeof(tBox) * game_elements->boxGroup.box_count);
+    fread(game_elements->boxGroup.boxes, sizeof(tBox), game_elements->boxGroup.box_count, pfile);
+    fread(&game_elements->boxGroup.key_count, sizeof(int), 1, pfile);
+    game_elements->boxGroup.keys = malloc(sizeof(tKey) * game_elements->boxGroup.key_count);
+    fread(game_elements->boxGroup.keys, sizeof(tKey), game_elements->boxGroup.key_count, pfile);
+
+    //Leitura dos dados da parede destrutivavel
+    fread(&game_elements->wallDGroup.WallD_count, sizeof(int), 1, pfile);
+    game_elements->wallDGroup.WallD = malloc(sizeof(tWallD) * game_elements->wallDGroup.WallD_count);
+    fread(game_elements->wallDGroup.WallD, sizeof(tWallD), game_elements->wallDGroup.WallD_count, pfile);
+
+    //Leitura dos dados do inimigo
+    fread(&game_elements->enemyGroup.count, sizeof(int), 1, pfile);
+    game_elements->enemyGroup.enemies = malloc(sizeof(Enemy) * game_elements->enemyGroup.count);
+    fread(game_elements->enemyGroup.enemies, sizeof(Enemy), game_elements->enemyGroup.count, pfile);
+
+    //Leitura dos dados do mapa
+    fread(&game_elements->map.rows, sizeof(int), 1, pfile);
+    fread(&game_elements->map.columns, sizeof(int), 1, pfile);
+    fread(&game_elements->map.mapId, sizeof(int), 1, pfile);
+    game_elements->map.matrix = malloc(game_elements->map.rows * sizeof(char*));
+    for (int i = 0; i < game_elements->map.rows; i++) {
+        game_elements->map.matrix[i] = malloc(game_elements->map.columns * sizeof(char));
+        fread(game_elements->map.matrix[i], sizeof(char), game_elements->map.columns, pfile);
+    }
+
+    game_elements->player.player_sprite = LoadTexture("sprites/gotinha.png"); 
+    game_elements->boxGroup.box_sprite = LoadTexture("sprites/caixa.png");
+    game_elements->boxGroup.key_sprite = LoadTexture("sprites/chave.png");
+    game_elements->wallDGroup.walld_sprite = LoadTexture("sprites/parededestrutivel.png"); 
+    game_elements->enemyGroup.enemy_sprite = LoadTexture("sprites/gotinha.png");
+    game_elements->map.wall_sprite = LoadTexture("sprites/parede.png");
+
     fclose(pfile);
-    game_elements->map = infos.map;
-    game_elements->player = infos.player;
-    game_elements->bomb = infos.bomb;
-    //game_elements.boxGroup = infos.game_elements.boxGroup;
-    game_elements->enemyGroup = infos.enemyGroup;
+
     return 1;
 }
 
 // Inicia o jogo do 0. Retorna 0 caso um erro ocorra.
 int StartGame(tElements *game_elements){
     resetBombInfo(&game_elements->bomb);
+    int score = game_elements->player.score;
     game_elements->player = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
     game_elements->player.lives = 3;
-    game_elements->player.score = 0;
+    game_elements->player.score = score;
     game_elements->player.is_invincible = false;
     game_elements->player.invincibility_timer = 0;
     GetPlayerStartPos(&game_elements->player, &game_elements->map);
@@ -402,6 +482,7 @@ void descontaTempo(tBomb *bomb, double startPauseTime){
 void ChangeMap(tElements *game_elements, AudioManager audio){
     int next_map_index = game_elements->map.mapId;
     PlaySound(audio.somNext_Map);
+    WaitTime(2.6);
     game_elements->map = game_elements->maps[next_map_index];
 
     StartGame(game_elements);
