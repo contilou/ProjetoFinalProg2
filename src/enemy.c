@@ -30,7 +30,7 @@ void InitEnemies(EnemyGroup *group, tMap *map) {
                 e->speed            = 1.0f;
                 e->timerDireção     = 0;
                 map->matrix[i][j]   = ' ';
-                e->enemy_sprite = enemy_sprite_aux; 
+                group->enemy_sprite = enemy_sprite_aux; 
             }
         }
     }
@@ -99,7 +99,7 @@ void DrawEnemies(EnemyGroup *group, tMap *map) {
     
     for (int i = 0; i < group->count; i++) {
         Enemy *e = &group->enemies[i];
-        DrawTexture(e->enemy_sprite, e->screenPos.x, e->screenPos.y, WHITE);
+        DrawTexture(group->enemy_sprite, e->screenPos.x, e->screenPos.y, WHITE);
     }
 }
 

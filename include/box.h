@@ -9,7 +9,6 @@ typedef struct {
     tMapPos matrixPos;
     bool hasKey;
     bool destroyed;
-    Texture2D box_sprite;
 
 } tBox;
 
@@ -18,7 +17,7 @@ typedef struct {
     tMapPos matrixPos;
     bool unlocked;
     bool picked;
-    Texture2D key_sprite;
+    
 
 } tKey;
 
@@ -26,8 +25,10 @@ typedef struct {
 
     tBox *boxes;
     int box_count;
+    Texture2D box_sprite;
     tKey *keys;
     int key_count;
+    Texture2D key_sprite;
 
 } tBoxGroup;
 

@@ -11,21 +11,8 @@
 #include "box.h"
 #include "wallD.h"
 
-typedef enum GameScreen { MENU, GAMEPLAY, PAUSE} GameScreen;
-
-//Variaveis locais
-tPlayer jogador = {{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
-tMap mapa;
-tMap *mapas = NULL;
-int num_maps = 0;
-char texto_xy[60], texto_matriz[60], textobomba[10],textovida[10],textopont[30], textochave[30], textonivel[30];
-tBomb bomba = {3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0}};
-EnemyGroup enemyGroup;
-tBoxGroup boxGroup;
-tWallDGroup wallDGroup;
-int started = 0;
-double startPauseTime;
-AudioManager audio;
+typedef enum GameScreen {MENU, GAMEPLAY, PAUSE} GameScreen;
+typedef enum HUD {LEVEL, LIFE, BOMB, KEY, SCORE} HUD;
 
 typedef struct{
     tMap map;
@@ -35,19 +22,40 @@ typedef struct{
     EnemyGroup enemyGroup;
 } tGameInfo;
 
+typedef struct{
+    tMap map;
+    tMap *maps;
+    tPlayer player;
+    tBomb bomb;
+    tBoxGroup boxGroup;
+    EnemyGroup enemyGroup;
+    tWallDGroup wallDGroup;
+    char texts[5][60];
+    
+} tElements;
 
 
 //Funções locais
-void UpdateDrawFrame(void);   // Atualiza e desenha um frame
-void checkExplosion(int bombIndex);
-int SaveGame();               // Salva o Jogo
-int StartGame(tMap *map);              // começa o jogo do 0
-int LoadGame();               // carrega os dados do último jogo nas variáveis locais 
-void descontaTempo();         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
-void ChangeMap(tMap maps[], tMap *current_map);
+void UpdateDrawFrame(tElements *game_elements);   // Atualiza e desenha um frame
+void checkExplosion(tElements *game_elements, int bombIndex, AudioManager audio);
+int SaveGame(tElements *game_elements);               // Salva o Jogo
+int StartGame(tElements *game_elements);              // começa o jogo do 0
+int LoadGame(tElements *game_elements);               // carrega os dados do último jogo nas variáveis locais 
+void descontaTempo(tBomb *bomb, double startPauseTime);         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
+void ChangeMap(tElements *game_elements, AudioManager audio);
 
 int main()
 {
+    //Variaveis locais
+    tElements game_elements;
+    game_elements.player = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
+    game_elements.maps = NULL;
+    int num_maps = 0;
+    game_elements.bomb = (tBomb){3, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0}};
+    int started = 0;
+    double startPauseTime;
+    AudioManager audio;
+
     //Altura e largura da janela
     const int screenWidth = 1200;
     const int screenHeight = 600;
@@ -58,15 +66,17 @@ int main()
     ClearBackground(RAYWHITE);
     SetTargetFPS(60);               // Executa jogo para 60 frames por segundo
 
-    bomba.bomb_sprite = LoadTexture("sprites/bomba.png");
-    bomba.explosion_tilemap = LoadTexture("sprites/bombaexplosao.png");
+    game_elements.bomb.sprite = LoadTexture("sprites/bomba.png");
+    game_elements.bomb.explosion_tilemap = LoadTexture("sprites/bombaexplosao.png");
 
-    if(InitMaps(&mapas, &num_maps) != 0){
+    if(InitMaps(&game_elements.maps, &num_maps) != 0){
         return 1;
     }
-    mapa = mapas[0];
+    game_elements.map = game_elements.maps[0];
 
-    if (!StartGame(&mapa)) return 1;
+    if (!StartGame(&game_elements)) return 1;
+    Music musicamenu = LoadMusicStream("audio/musica.mp3");
+    SetMusicVolume(musicamenu, 0.8);
 
     GameScreen currentScreen = MENU;
 
@@ -88,7 +98,7 @@ int main()
             }
             BeginDrawing();
             ClearBackground(DARKBLUE);
-            DrawText("MENU PRINCIPAL", 470, 200, 30, WHITE);
+            DrawText("SUPER BOMBINHO ADVENTURES", 365, 200, 30, WHITE);
             DrawRectangle(380,290,470,50, WHITE);
             DrawText("Jogar (Enter)", 500, 300, 30, DARKBLUE);
             DrawRectangle(380,360,470,50, WHITE);
@@ -107,33 +117,33 @@ int main()
             if (IsKeyPressed(KEY_N)){
                 StopMusicStream(audio.musicaPausa);
                 PlaySound(audio.somStart);
-                if(InitMaps(&mapas, &num_maps) != 0){
+                if(InitMaps(&game_elements.maps, &num_maps) != 0){
                     return 1;
                 }
-                jogador.score = 0;
-                mapa = mapas[0];
-                if (!StartGame(&mapa)) return 1;
-                descontaTempo();
+                game_elements.player.score = 0;
+                game_elements.map = game_elements.maps[0];
+                if (!StartGame(&game_elements)) return 1;
+                descontaTempo(&game_elements.bomb, startPauseTime);
                 currentScreen = GAMEPLAY;    
             }
             // C para carregar jogo salvo
             if (IsKeyPressed(KEY_C)) {
                 StopMusicStream(audio.musicaPausa);
-                if(!LoadGame()){
+                if(!LoadGame(&game_elements)){
                     BeginDrawing();
                     ClearBackground(DARKBLUE);
                     DrawText("Erro ao carregar jogo", 420, 300, 40, WHITE);
                     WaitTime(1);
                     EndDrawing();
                 }
-                descontaTempo();
+                descontaTempo(&game_elements.bomb, startPauseTime);
                 currentScreen = GAMEPLAY;
             }
             // S para salvar o progresso atul
             if (IsKeyPressed(KEY_S)) {
                 StopMusicStream(audio.musicaPausa);
                 PlaySound(audio.somBotao);
-                if(SaveGame()){
+                if(SaveGame(&game_elements)){
                     BeginDrawing();
                     ClearBackground(DARKBLUE);
                     DrawText("Jogo salvo com sucesso", 370, 280, 40, WHITE);
@@ -157,7 +167,7 @@ int main()
             // V para despausar
             if (IsKeyPressed(KEY_V)) {   
                 StopMusicStream(audio.musicaPausa);
-                descontaTempo();
+                descontaTempo(&game_elements.bomb, startPauseTime);
                 currentScreen = GAMEPLAY;
             }
             DrawText("Novo Jogo (N)", 440, 200, 30, WHITE);
@@ -175,43 +185,40 @@ int main()
                 currentScreen=PAUSE;
             }
             ClearBackground(RAYWHITE);
-            UpdateDrawFrame();
-            BombsManager(&jogador, &mapa, &bomba, audio);
-            if(jogador.keys >= 5){
-                ChangeMap(mapas, &mapa);//Passa de nível quando o jogador pega 5 chaves
+            UpdateDrawFrame(&game_elements);
+            BombsManager(&game_elements.player, &game_elements.map, &game_elements.bomb, audio);
+            if(game_elements.player.keys >= 5){
+                ChangeMap(&game_elements, audio);//Passa de nível quando o jogador pega 5 chaves
             }
-            MovePlayer(&jogador, &mapa, audio); //Move o jogador
+            MovePlayer(&game_elements.player, &game_elements.map, audio); //Move o jogador
             float dt = GetFrameTime();
-            UpdateEnemies(&enemyGroup, dt, &mapa);
-            CheckKey(&boxGroup, &mapa);
+            UpdateEnemies(&game_elements.enemyGroup, dt, &game_elements.map);
+            CheckKey(&game_elements.boxGroup, &game_elements.map);
 
-
-            sprintf(texto_xy, "Posição na tela - X: %d Y: %d", 20 * jogador.matrixPos.column, 20 * jogador.matrixPos.row); //Funciona com qlqr numeros de variaveis.
-            sprintf(texto_matriz, "Posição na matriz - Coluna: %d Linha: %d", jogador.matrixPos.column, jogador.matrixPos.row); //Dentro da variavel texto , ele põe outras variaveis
-            sprintf(textobomba, "Bombas: %d", bomba.bombsLeft);   //Indicador de bombas restantes
-            sprintf(textovida, "Vidas: %d", jogador.lives);     //Preencher apos criar o sistema de vidas
-            sprintf(textopont, "Pontuacao: %d", jogador.score);   //Indicador de posição
-            sprintf(textonivel, "Nivel %d", mapa.mapId);
-            sprintf(textochave, "Chaves: %d/5", jogador.keys); // Subsituir pelo sprite da chave dps
+            sprintf(game_elements.texts[BOMB], "Bombas: %d", game_elements.bomb.bombsLeft);   //Indicador de bombas restantes
+            sprintf(game_elements.texts[LIFE], "Vidas: %d", game_elements.player.lives);     //Preencher apos criar o sistema de vidas
+            sprintf(game_elements.texts[SCORE], "Pontuacao: %d", game_elements.player.score);   //Indicador de posição
+            sprintf(game_elements.texts[LEVEL], "Nivel %d", game_elements.map.mapId);
+            sprintf(game_elements.texts[KEY], "Chaves: %d/5", game_elements.player.keys); // Subsituir pelo sprite da chave dps
 
             for(int i = 0; i < 3; i++){
-                if(bomba.exploded[i]){
-                    checkExplosion(i);
+                if(game_elements.bomb.exploded[i]){
+                    checkExplosion(&game_elements, i, audio);
                 }
             }
             
             //Se o jogador morrer
-            if (jogador.lives <= 0) {
+            if (game_elements.player.lives <= 0) {
                 //Retorna ao menu
                 PlaySound(audio.somMorte);
                 currentScreen = MENU;
                 // Reinicia o estado do jogo para quando o jogador quiser jogar novamente
-                if(InitMaps(&mapas, &num_maps) != 0){
+                if(InitMaps(&game_elements.maps, &num_maps) != 0){
                     return 1;
                 }
-                mapa = mapas[0];
+                game_elements.map = game_elements.maps[0];
 
-                if (!StartGame(&mapa)) return 1;
+                if (!StartGame(&game_elements)) return 1;
             }
 
             // na transição do menu para o jogo, há um intervalo de 0.7 segundos 
@@ -220,28 +227,31 @@ int main()
                 started=0;
             }
 
-            if(DamageByEnemies(&enemyGroup, &jogador)){
-                DamagePlayer(&jogador, audio);
+            if(DamageByEnemies(&game_elements.enemyGroup, &game_elements.player)){
+                DamagePlayer(&game_elements.player, audio);
             }
             
 
             //Bloco de código temporário, enquanto não fiz a interação da bomba com a Parede destrutivel
             if(IsKeyPressed(KEY_P)){
-                for(int i = 0; i < wallDGroup.WallD_count; i++){
-                    tWallD *currentWallD = &wallDGroup.WallD[i];
+                for(int i = 0; i < game_elements.wallDGroup.WallD_count; i++){
+                    tWallD *currentWallD = &game_elements.wallDGroup.WallD[i];
                     if(!currentWallD->destroyed){
-                        DestroyWallD(&wallDGroup,currentWallD->matrixPos,&mapa);
+                        DestroyWallD(&game_elements.wallDGroup,currentWallD->matrixPos,&game_elements.map);
                     }
                 }
             }
         } 
     }
 
-    
-    FreeBoxGroup(&boxGroup);
-    FreeWallD(&wallDGroup);
-    FreeEnemies(&enemyGroup);
+    UnloadTexture(game_elements.enemyGroup.enemy_sprite);
+    UnloadTexture(game_elements.bomb.sprite);
+    UnloadTexture(game_elements.bomb.explosion_tilemap);
+    FreeBoxGroup(&game_elements.boxGroup);
+    FreeWallD(&game_elements.wallDGroup);
+    FreeEnemies(&game_elements.enemyGroup);
     EliminaAudio(audio);
+    UnloadMusicStream(musicamenu);
     CloseWindow();                  // Fecha a janela
 
 
@@ -249,70 +259,64 @@ int main()
 }
 
 // Atualiza os quadros do jogo
-void UpdateDrawFrame(void)
+void UpdateDrawFrame(tElements *game_elements)
 {
 
-
     BeginDrawing();     //Inicia o ambiente de desenho na tela
-
-        ClearBackground(SKYBLUE);   //Limpa a tela e define cor de fundo
+        Color background = GetColor(0x9BD5FF00);
+        ClearBackground(background);   //Limpa a tela e define cor de fundo
 
         //BeginMode2D(camera);
 
-            DrawWalls(&mapa);
-            DrawWallsD(&wallDGroup, &mapa);
-            DrawKeys(&boxGroup, &mapa);
-            DrawPlayer(&jogador, &mapa);  //Desenha o jogador 
-            DrawEnemies(&enemyGroup, &mapa); //Desenha os inimigos
-            DrawBoxes(&boxGroup, &mapa);
+            DrawWalls(&game_elements->map);
+            DrawWallsD(&game_elements->wallDGroup, &game_elements->map);
+            DrawKeys(&game_elements->boxGroup, &game_elements->map);
+            DrawPlayer(&game_elements->player, &game_elements->map);  //Desenha o jogador 
+            DrawEnemies(&game_elements->enemyGroup, &game_elements->map); //Desenha os inimigos
+            DrawBoxes(&game_elements->boxGroup, &game_elements->map);
             
 
         //EndMode2D();
 
-        DrawText(texto_xy, 10, 15, 20, WHITE);
-        DrawText(texto_matriz, 350, 15, 20, WHITE);
-        DrawText(textonivel, 70,540,20, BLACK);
-        DrawText(textovida, 302,540,20, BLACK);
-        DrawText(textobomba, 534,540,20, BLACK);
-        DrawText(textopont, 766,540,20, BLACK);
-        DrawText(textochave, 998,540,20, BLACK);
+        DrawText(game_elements->texts[LEVEL], 70,540,20, BLACK);
+        DrawText(game_elements->texts[LIFE], 302,540,20, BLACK);
+        DrawText(game_elements->texts[BOMB], 534,540,20, BLACK);
+        DrawText(game_elements->texts[SCORE], 766,540,20, BLACK);
+        DrawText(game_elements->texts[KEY], 998,540,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
 }
 
-void checkExplosion(int bombIndex){
+void checkExplosion(tElements *game_elements, int bombIndex, AudioManager audio){
     for(int i=0;i<9;i++){
 
-        tMapPos explosionPos = {bomba.area[bombIndex][i].row,bomba.area[bombIndex][i].column};
+        tMapPos explosionPos = {game_elements->bomb.area[bombIndex][i].row,game_elements->bomb.area[bombIndex][i].column};
 
         if(explosionPos.row == -1){
             continue;
         }
 
         //Se a explosão atingiu o jogador, aplica o dano.
-        if (explosionPos.row == jogador.matrixPos.row && explosionPos.column == jogador.matrixPos.column) {
-            DamagePlayer(&jogador, audio);
+        if (explosionPos.row == game_elements->player.matrixPos.row && explosionPos.column == game_elements->player.matrixPos.column) {
+            DamagePlayer(&game_elements->player, audio);
             // Não é necessário continuar verificando esta explosão, pois o dano já foi aplicado
             // e o jogador está invencível por um curto período.
         }
 
-        switch (mapa.matrix[explosionPos.row][explosionPos.column]){
+        switch (game_elements->map.matrix[explosionPos.row][explosionPos.column]){
             case 'K':
             case 'B':
-                DestroyBox(&boxGroup, explosionPos, &mapa);
-                ChangeScore(&jogador, 10);
+                DestroyBox(&game_elements->boxGroup, explosionPos, &game_elements->map);
+                ChangeScore(&game_elements->player, 10);
                 break;
             case 'C':
                 break;
             case 'D':
-                DestroyWallD(&wallDGroup, explosionPos, &mapa);
-                ChangeScore(&jogador, 10);
-                break;
-            case 'J':
-
+                DestroyWallD(&game_elements->wallDGroup, explosionPos, &game_elements->map);
+                ChangeScore(&game_elements->player, 10);
                 break;
             case 'E':
-                ChangeScore(&jogador, 20);
+                ChangeScore(&game_elements->player, 20);
                 break;
         }
 
@@ -320,14 +324,14 @@ void checkExplosion(int bombIndex){
 }
 
 // salva as informações do jogo atual. Retorna 0 caso um erro ocorra.
-int SaveGame(){
+int SaveGame(tElements *game_elements){
     FILE *pfile;
     tGameInfo infos;
-    infos.map = mapa;
-    infos.player = jogador;
-    infos.bomb = bomba;
-    // infos.boxGroup = boxGroup;
-    infos.enemyGroup = enemyGroup;
+    infos.map = game_elements->map;
+    infos.player = game_elements->player;
+    infos.bomb = game_elements->bomb;
+    // infos.game_elements.boxGroup = game_elements.boxGroup;
+    infos.enemyGroup = game_elements->enemyGroup;
     if (!(pfile = fopen("lastGame.dat", "wb"))) return 0;
     fwrite(&infos, sizeof(tGameInfo), 1, pfile);
     fclose(pfile);
@@ -335,52 +339,52 @@ int SaveGame(){
 }
 
 // Carrega o estado do jogo salvo no arquivo binário. Retorna 0 caso um erro ocorra.
-int LoadGame(){
+int LoadGame(tElements *game_elements){
     FILE *pfile;
     tGameInfo infos;
     if (!(pfile = fopen("lastGame.dat", "rb"))) return 0;
     fread(&infos, sizeof(tGameInfo), 1, pfile);
     fclose(pfile);
-    mapa = infos.map;
-    jogador = infos.player;
-    bomba = infos.bomb;
-    //boxGroup = infos.boxGroup;
-    enemyGroup = infos.enemyGroup;
+    game_elements->map = infos.map;
+    game_elements->player = infos.player;
+    game_elements->bomb = infos.bomb;
+    //game_elements.boxGroup = infos.game_elements.boxGroup;
+    game_elements->enemyGroup = infos.enemyGroup;
     return 1;
 }
 
 // Inicia o jogo do 0. Retorna 0 caso um erro ocorra.
-int StartGame(tMap *map){
-    resetBombInfo(&bomba);
-    jogador = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
-    jogador.lives = 3;
-    jogador.score = 0;
-    jogador.is_invincible = false;
-    jogador.invincibility_timer = 0;
-    GetPlayerStartPos(&jogador, map);
-    InitEnemies(&enemyGroup, map);
-    InitBoxes(&boxGroup, map);
-    InitWallD(&wallDGroup, map);
+int StartGame(tElements *game_elements){
+    resetBombInfo(&game_elements->bomb);
+    game_elements->player = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
+    game_elements->player.lives = 3;
+    game_elements->player.score = 0;
+    game_elements->player.is_invincible = false;
+    game_elements->player.invincibility_timer = 0;
+    GetPlayerStartPos(&game_elements->player, &game_elements->map);
+    InitEnemies(&game_elements->enemyGroup, &game_elements->map);
+    InitBoxes(&game_elements->boxGroup, &game_elements->map);
+    InitWallD(&game_elements->wallDGroup, &game_elements->map);
     return 1;
 }
 
 // se houvesse uma bomba plantada antes da pause, o tempo que
 // o jogo ficou pausado deve ser descontado.
-void descontaTempo(){
+void descontaTempo(tBomb *bomb, double startPauseTime){
     for (int i=0; i<3; i++){
-        if (bomba.isPlanted[i]==true){
+        if (bomb->isPlanted[i]==true){
             double delta = GetTime() - startPauseTime;
-            bomba.planted_times[i] += delta;
-            bomba.explosion_times[i] += delta;
+            bomb->planted_times[i] += delta;
+            bomb->explosion_times[i] += delta;
         }
     }
 }
 
-void ChangeMap(tMap maps[], tMap *current_map){
-    int next_map_index = current_map->mapId;
+void ChangeMap(tElements *game_elements, AudioManager audio){
+    int next_map_index = game_elements->map.mapId;
     PlaySound(audio.somNext_Map);
-    *current_map = maps[next_map_index];
+    game_elements->map = game_elements->maps[next_map_index];
 
-    StartGame(current_map);
+    StartGame(game_elements);
 
 }

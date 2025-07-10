@@ -19,7 +19,7 @@ void PlantBomb(tBomb *bomb, tMap *mapa, AudioManager audio){
     for (int i=0; i<3; i++){
         if (bomb->isPlanted[i]==true){
             if(GetTime()-bomb->planted_times[i]<3){
-                DrawTexture(bomb->bomb_sprite, bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, WHITE);
+                DrawTexture(bomb->sprite, bomb->positions[i].column * mapa->tile_size, bomb->positions[i].row * mapa->tile_size, WHITE);
             }
             else{
                 bomb->exploded[i]=true;

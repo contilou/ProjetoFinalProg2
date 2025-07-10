@@ -12,7 +12,6 @@ typedef struct {
     float speed;
     float timerDireção;
     bool isAlive;
-    Texture2D enemy_sprite;
 
 } Enemy;
 
@@ -20,6 +19,7 @@ typedef struct {
 
     Enemy *enemies;
     int count;
+    Texture2D enemy_sprite;
 
 } EnemyGroup;
 
