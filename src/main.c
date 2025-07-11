@@ -83,8 +83,8 @@ int main()
 
     while(!WindowShouldClose()){
         // Menu inicial
-        UpdateMusicStream(audio.musicaMenu);
         if(currentScreen==MENU){
+            UpdateMusicStream(audio.musicaMenu);
             if (!IsMusicStreamPlaying(audio.musicaMenu) && !IsSoundPlaying(audio.somMorte)) {
                 PlayMusicStream(audio.musicaMenu);
             }
@@ -111,12 +111,17 @@ int main()
             BeginDrawing();
             ClearBackground(DARKBLUE);
             UpdateMusicStream(audio.musicaPausa);
+            if (IsMusicStreamPlaying(audio.musicaJogo)){
+                PauseMusicStream(audio.musicaJogo);
+            }
+            
             if (!IsMusicStreamPlaying(audio.musicaPausa)){
                 PlayMusicStream(audio.musicaPausa);
             }
             // N apra iniciar novo jogo
             if (IsKeyPressed(KEY_N)){
                 StopMusicStream(audio.musicaPausa);
+                StopMusicStream(audio.musicaJogo);
                 PlaySound(audio.somStart);
                 if(InitMaps(&game_elements.maps, &num_maps) != 0){
                     return 1;
@@ -167,7 +172,9 @@ int main()
             }
             // V para despausar
             if (IsKeyPressed(KEY_V)) {   
-                StopMusicStream(audio.musicaPausa);
+                if (IsMusicStreamPlaying(audio.musicaJogo)){
+                ResumeMusicStream(audio.musicaJogo); 
+                }
                 descontaTempo(&game_elements.bomb, startPauseTime);
                 currentScreen = GAMEPLAY;
             }
@@ -181,7 +188,13 @@ int main()
         }
         // Gameplay
         else{
+            UpdateMusicStream(audio.musicaJogo);
+            if (!IsMusicStreamPlaying(audio.musicaJogo)){
+                PlayMusicStream(audio.musicaJogo);
+            }
             if (IsKeyPressed(KEY_TAB)) {
+                PauseMusicStream(audio.musicaJogo);
+                UpdateMusicStream(audio.musicaPausa);
                 startPauseTime = GetTime();
                 currentScreen=PAUSE;
             }
