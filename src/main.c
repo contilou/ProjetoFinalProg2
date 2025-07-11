@@ -45,6 +45,21 @@ int LoadGame(tElements *game_elements);               // carrega os dados do úl
 void descontaTempo(tBomb *bomb, double startPauseTime);         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
 void ChangeMap(tElements *game_elements, AudioManager audio);
 
+void DrawCharMatrix(char **charMatrix, int rows, int cols, Font font, Color textColor) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            // Calcula a posição X e Y para o caractere atual
+            int posX = j * 20;
+            int posY = i * 20;
+
+            // Desenha o caractere. Convertemos o char para um array de char temporário
+            // porque DrawTextEx espera um const char*.
+            char charToDraw[2] = {charMatrix[i][j], '\0'};
+            DrawTextEx(font, charToDraw, (Vector2){ (float)posX, (float)posY }, (float)20, 0, textColor);
+        }
+    }
+}
+
 int main()
 {
     //Variaveis locais
@@ -67,6 +82,7 @@ int main()
     ClearBackground(RAYWHITE);
     SetTargetFPS(60);               // Executa jogo para 60 frames por segundo
 
+    game_elements.player.player_sprite = LoadTexture("sprites/jogador.png");
     game_elements.bomb.sprite = LoadTexture("sprites/bomba.png");
     game_elements.bomb.explosion_tilemap = LoadTexture("sprites/bombaexplosao.png");
 
@@ -280,9 +296,28 @@ void UpdateDrawFrame(tElements *game_elements)
             DrawKeys(&game_elements->boxGroup, &game_elements->map);
             DrawPlayer(&game_elements->player, &game_elements->map);  //Desenha o jogador 
             DrawEnemies(&game_elements->enemyGroup, &game_elements->map); //Desenha os inimigos
-            DrawBoxes(&game_elements->boxGroup, &game_elements->map);            
+            DrawBoxes(&game_elements->boxGroup, &game_elements->map); 
+            DrawCharMatrix(game_elements->map.matrix, game_elements->map.rows, game_elements->map.columns, GetFontDefault(), BLACK);           
 
         //EndMode2D();
+
+        DrawRectangle(0,500, 1200, 100, WHITE);
+
+        int height = 500;
+        for(int i = 0; i < 4; i++){
+            //Desenha a borda da HUD verticalmente
+            DrawTexture(game_elements->map.wall_sprite, 0, height, GRAY);
+            DrawTexture(game_elements->map.wall_sprite, 1180, height, GRAY);
+            height += 20;
+        }
+
+        for(int width = 0; width < 1200; width += 20){
+            //Desenha a borda da HUD horizontalmente
+            DrawTexture(game_elements->map.wall_sprite, width, 500, GRAY);
+            DrawTexture(game_elements->map.wall_sprite, width, 580, GRAY);
+
+
+        }
 
         DrawText(game_elements->texts[LEVEL], 70,540,20, BLACK);
         DrawText(game_elements->texts[LIFE], 302,540,20, BLACK);
@@ -418,7 +453,7 @@ int LoadGame(tElements *game_elements){
         fread(game_elements->map.matrix[i], sizeof(char), game_elements->map.columns, pfile);
     }
 
-    game_elements->player.player_sprite = LoadTexture("sprites/gotinha.png"); 
+    game_elements->player.player_sprite = LoadTexture("sprites/jogador.png"); 
     game_elements->boxGroup.box_sprite = LoadTexture("sprites/caixa.png");
     game_elements->boxGroup.key_sprite = LoadTexture("sprites/chave.png");
     game_elements->wallDGroup.walld_sprite = LoadTexture("sprites/parededestrutivel.png"); 
@@ -433,10 +468,9 @@ int LoadGame(tElements *game_elements){
 // Inicia o jogo do 0. Retorna 0 caso um erro ocorra.
 int StartGame(tElements *game_elements){
     resetBombInfo(&game_elements->bomb);
-    int score = game_elements->player.score;
     game_elements->player = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
+    game_elements->player.player_sprite = LoadTexture("sprites/jogador.png");
     game_elements->player.lives = 3;
-    game_elements->player.score = score;
     game_elements->player.is_invincible = false;
     game_elements->player.invincibility_timer = 0;
     GetPlayerStartPos(&game_elements->player, &game_elements->map);
@@ -468,6 +502,8 @@ void ChangeMap(tElements *game_elements, AudioManager audio){
     WaitTime(2.6);
     game_elements->map = game_elements->maps[next_map_index];
 
+    int score = game_elements->player.score;
     StartGame(game_elements);
+    game_elements->player.score = score;
 
 }

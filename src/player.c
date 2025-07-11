@@ -146,10 +146,12 @@ void DrawPlayer(tPlayer *player, tMap *map){
             // A função fmod(dividendo, divisor) retorna o resto da divisão.
             // Usamos para criar um efeito de piscar a cada 0.2 segundos.   
             if (fmod(player->invincibility_timer, 0.2f) > 0.1f) {
-                DrawRectangle(player->screenPos.x, player->screenPos.y, map->tile_size, map->tile_size, VIOLET);
+                DrawTexture(player->player_sprite, player->screenPos.x, player->screenPos.y, WHITE);
+            }else{
+                DrawTexture(player->player_sprite, player->screenPos.x, player->screenPos.y, RED);
             }
         } else {
-            DrawRectangle(player->screenPos.x, player->screenPos.y, map->tile_size, map->tile_size, VIOLET);
+            DrawTexture(player->player_sprite, player->screenPos.x, player->screenPos.y, WHITE);
         }
 
 }
@@ -161,6 +163,7 @@ void DamagePlayer(tPlayer *player, AudioManager audio){
         player->lives--;
         player->is_invincible = true;
         player->invincibility_timer = 1.5f; // 1.5 segundos de invencibilidade
+        ChangeScore(player, -100);
     }
 }
 
@@ -169,7 +172,8 @@ bool DamageByEnemies(EnemyGroup *group, tPlayer *player){
     for (int i = 0; i < group->count; i++) {
         // Compara a posição do inimigo (usando 'group') com a do jogador (usando 'player')
         if (group->enemies[i].matrixPos.row == player->matrixPos.row && 
-            group->enemies[i].matrixPos.column == player->matrixPos.column) 
+            group->enemies[i].matrixPos.column == player->matrixPos.column &&
+            group->enemies[i].isAlive)
         {
             return true; // Retorna verdadeiro se encontrou colisão
         }
