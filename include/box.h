@@ -2,6 +2,7 @@
 #define BOX_H_
 
 #include <raylib.h>
+#include <stdlib.h>
 #include "map.h"
 
 typedef struct {

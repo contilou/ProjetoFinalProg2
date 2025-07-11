@@ -1,6 +1,5 @@
 #include "wallD.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 
 int InitWallD(tWallDGroup *group, tMap *map){
     

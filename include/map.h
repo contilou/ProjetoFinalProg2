@@ -1,5 +1,6 @@
 #ifndef MAP_H_
 #define MAP_H_
+
 #include <stdio.h>
 
 typedef struct {

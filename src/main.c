@@ -11,7 +11,7 @@
 #include "box.h"
 #include "wallD.h"
 
-typedef enum GameScreen {MENU, GAMEPLAY, PAUSE} GameScreen;
+typedef enum GameScreen {MENU, GAMEPLAY, PAUSE, END_GAME} GameScreen;
 typedef enum HUD {LEVEL, LIFE, BOMB, KEY, SCORE} HUD;
 
 typedef struct{
@@ -44,21 +44,6 @@ int StartGame(tElements *game_elements);              // começa o jogo do 0
 int LoadGame(tElements *game_elements);               // carrega os dados do último jogo nas variáveis locais 
 void descontaTempo(tBomb *bomb, double startPauseTime);         // função para descontar o tempo em que o jogo esteve pausada e as bombas, plantadas.
 void ChangeMap(tElements *game_elements, AudioManager audio);
-
-void DrawCharMatrix(char **charMatrix, int rows, int cols, Font font, Color textColor) {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            // Calcula a posição X e Y para o caractere atual
-            int posX = j * 20;
-            int posY = i * 20;
-
-            // Desenha o caractere. Convertemos o char para um array de char temporário
-            // porque DrawTextEx espera um const char*.
-            char charToDraw[2] = {charMatrix[i][j], '\0'};
-            DrawTextEx(font, charToDraw, (Vector2){ (float)posX, (float)posY }, (float)20, 0, textColor);
-        }
-    }
-}
 
 int main()
 {
@@ -99,8 +84,8 @@ int main()
 
     while(!WindowShouldClose()){
         // Menu inicial
+        UpdateMusicStream(audio.musicaMenu);
         if(currentScreen==MENU){
-            UpdateMusicStream(audio.musicaMenu);
             if (!IsMusicStreamPlaying(audio.musicaMenu) && !IsSoundPlaying(audio.somMorte)) {
                 PlayMusicStream(audio.musicaMenu);
             }
@@ -118,12 +103,10 @@ int main()
             DrawText("SUPER BOMBINHO ADVENTURES", 365, 200, 30, WHITE);
             DrawRectangle(380,290,470,50, WHITE);
             DrawText("Jogar (Enter)", 500, 300, 30, DARKBLUE);
-            DrawRectangle(380,360,470,50, WHITE);
-            DrawText("Melhores Pontuações (M)", 420, 370, 30, DARKBLUE);
             EndDrawing();
         }
         // Tela de Pause
-        else if(currentScreen==PAUSE){
+        else if(currentScreen == PAUSE){
             BeginDrawing();
             ClearBackground(DARKBLUE);
             UpdateMusicStream(audio.musicaPausa);
@@ -189,7 +172,7 @@ int main()
             // V para despausar
             if (IsKeyPressed(KEY_V)) {   
                 if (IsMusicStreamPlaying(audio.musicaJogo)){
-                ResumeMusicStream(audio.musicaJogo); 
+                    ResumeMusicStream(audio.musicaJogo); 
                 }
                 descontaTempo(&game_elements.bomb, startPauseTime);
                 currentScreen = GAMEPLAY;
@@ -203,7 +186,7 @@ int main()
 
         }
         // Gameplay
-        else{
+        else if(currentScreen == GAMEPLAY){
             UpdateMusicStream(audio.musicaJogo);
             if (!IsMusicStreamPlaying(audio.musicaJogo)){
                 PlayMusicStream(audio.musicaJogo);
@@ -218,7 +201,14 @@ int main()
             UpdateDrawFrame(&game_elements);
             BombsManager(&game_elements.player, &game_elements.map, &game_elements.bomb, audio);
             if(game_elements.player.keys >= 5){
-                ChangeMap(&game_elements, audio);//Passa de nível quando o jogador pega 5 chaves
+                // Passa de nível quando o jogador pega 5 chaves, se for o ultimo mapa, a tela muda para "END_GAME"
+
+                if (game_elements.map.mapId == num_maps){
+                    currentScreen = END_GAME;                 
+                }
+                else {
+                    ChangeMap(&game_elements, audio); 
+                }
             }
             MovePlayer(&game_elements.player, &game_elements.map, audio); //Move o jogador
             float dt = GetFrameTime();
@@ -260,21 +250,47 @@ int main()
             if(DamageByEnemies(&game_elements.enemyGroup, &game_elements.player)){
                 DamagePlayer(&game_elements.player, audio);
             }
-            
 
-            //Bloco de código temporário, enquanto não fiz a interação da bomba com a Parede destrutivel
             if(IsKeyPressed(KEY_P)){
-                for(int i = 0; i < game_elements.wallDGroup.WallD_count; i++){
-                    tWallD *currentWallD = &game_elements.wallDGroup.WallD[i];
-                    if(!currentWallD->destroyed){
-                        DestroyWallD(&game_elements.wallDGroup,currentWallD->matrixPos,&game_elements.map);
-                    }
-                }
+                game_elements.player.keys = 5;
             }
         } 
+        // Tela de fim de jogo
+        else{
+            BeginDrawing();
+            ClearBackground(DARKBLUE);
+            const int fontSize = 30;
+            char* parabens_text = "Parabens, voce completou o jogo!";
+            char* score_text = game_elements.texts[SCORE];
+            char* jogar_novamente_text = "Jogar novamente (ENTER)";
+            char* menu_principal_text = "Menu principal (M)";
+
+            DrawText(parabens_text, (screenWidth - MeasureText(parabens_text, fontSize)) / 2, 150, fontSize, WHITE);
+            DrawText(score_text, (screenWidth - MeasureText(score_text, fontSize)) / 2,250, fontSize, WHITE);
+            DrawText(jogar_novamente_text, (screenWidth - MeasureText(jogar_novamente_text, fontSize)) / 2, 320, fontSize, WHITE);
+            DrawText(menu_principal_text, (screenWidth - MeasureText(menu_principal_text, fontSize)) / 2, 360, fontSize, WHITE);
+            EndDrawing();
+            
+            // Reinicia o jogo quando o jogador aperta enter
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                if(InitMaps(&game_elements.maps, &num_maps) != 0){
+                    return 1;
+                }
+                game_elements.map = game_elements.maps[0];
+                if (!StartGame(&game_elements)) return 1;
+                currentScreen = GAMEPLAY;
+            }
+            
+            if (IsKeyPressed(KEY_M))
+            {
+                currentScreen = MENU;
+            }
+            
+        }
     }
 
-
+    // Libera memoria de todas as texturas do jogo
     UnloadTexture(game_elements.map.wall_sprite);
     UnloadTexture(game_elements.maps->wall_sprite);
     UnloadTexture(game_elements.wallDGroup.walld_sprite);
@@ -283,13 +299,14 @@ int main()
     UnloadTexture(game_elements.enemyGroup.enemy_sprite);
     UnloadTexture(game_elements.bomb.sprite);
     UnloadTexture(game_elements.bomb.explosion_tilemap);
+
+    // Libera a memoria alocada paras as variaveis dos objetos do jogo
     FreeBoxGroup(&game_elements.boxGroup);
     FreeWallD(&game_elements.wallDGroup);
     FreeEnemies(&game_elements.enemyGroup);
     EliminaAudio(audio);
     UnloadMusicStream(musicamenu);
     CloseWindow();                  // Fecha a janela
-
 
     return 0;
 }
@@ -299,44 +316,39 @@ void UpdateDrawFrame(tElements *game_elements)
 {
 
     BeginDrawing();     //Inicia o ambiente de desenho na tela
-        Color background = GetColor(0x9BD5FF00);
-        ClearBackground(background);   //Limpa a tela e define cor de fundo
+    Color background = GetColor(0x9BD5FF00);
+    ClearBackground(background);   //Limpa a tela e define cor de fundo
 
-        //BeginMode2D(camera);
+    //BeginMode2D(camera);
 
-            DrawWalls(&game_elements->map);
-            DrawWallsD(&game_elements->wallDGroup, &game_elements->map);
-            DrawKeys(&game_elements->boxGroup, &game_elements->map);
-            DrawPlayer(&game_elements->player, &game_elements->map);  //Desenha o jogador 
-            DrawEnemies(&game_elements->enemyGroup, &game_elements->map); //Desenha os inimigos
-            DrawBoxes(&game_elements->boxGroup, &game_elements->map); 
-            DrawCharMatrix(game_elements->map.matrix, game_elements->map.rows, game_elements->map.columns, GetFontDefault(), BLACK);           
-
-        //EndMode2D();
-
-        DrawRectangle(0,500, 1200, 100, WHITE);
-
-        int height = 500;
-        for(int i = 0; i < 4; i++){
-            //Desenha a borda da HUD verticalmente
-            DrawTexture(game_elements->map.wall_sprite, 0, height, GRAY);
-            DrawTexture(game_elements->map.wall_sprite, 1180, height, GRAY);
-            height += 20;
-        }
-
-        for(int width = 0; width < 1200; width += 20){
-            //Desenha a borda da HUD horizontalmente
-            DrawTexture(game_elements->map.wall_sprite, width, 500, GRAY);
-            DrawTexture(game_elements->map.wall_sprite, width, 580, GRAY);
+    DrawWalls(&game_elements->map); // Desenha as paredes indestrutiveis
+    DrawWallsD(&game_elements->wallDGroup, &game_elements->map); // Desenhas as paredes destrutiveis
+    DrawKeys(&game_elements->boxGroup, &game_elements->map); // Desenha as chave
+    DrawPlayer(&game_elements->player, &game_elements->map);  // Desenha o jogador 
+    DrawEnemies(&game_elements->enemyGroup, &game_elements->map); // Desenha os inimigos
+    DrawBoxes(&game_elements->boxGroup, &game_elements->map); // Desenha as caixas
 
 
-        }
+    //EndMode2D();
 
-        DrawText(game_elements->texts[LEVEL], 70,540,20, BLACK);
-        DrawText(game_elements->texts[LIFE], 302,540,20, BLACK);
-        DrawText(game_elements->texts[BOMB], 534,540,20, BLACK);
-        DrawText(game_elements->texts[SCORE], 766,540,20, BLACK);
-        DrawText(game_elements->texts[KEY], 998,540,20, BLACK);
+    int height = 500;
+        //Desenha a borda da HUD verticalmente
+        DrawTexture(game_elements->map.wall_sprite, 0, height, GRAY);
+        DrawTexture(game_elements->map.wall_sprite, 1180, height, GRAY);
+        height += 20;
+    }
+
+    for(int width = 0; width < 1200; width += 20){
+        //Desenha a borda da HUD horizontalmente
+        DrawTexture(game_elements->map.wall_sprite, width, 500, GRAY);
+        DrawTexture(game_elements->map.wall_sprite, width, 580, GRAY);
+    }
+
+    DrawText(game_elements->texts[LEVEL], 70,540,20, BLACK);
+    DrawText(game_elements->texts[LIFE], 302,540,20, BLACK);
+    DrawText(game_elements->texts[BOMB], 534,540,20, BLACK);
+    DrawText(game_elements->texts[SCORE], 766,540,20, BLACK);
+    DrawText(game_elements->texts[KEY], 998,540,20, BLACK);
     EndDrawing();   //Finaliza o ambiente de desenho na tela
 
 }
@@ -389,7 +401,6 @@ void checkExplosion(tElements *game_elements, int bombIndex, AudioManager audio)
 // salva as informações do jogo atual. Retorna 0 caso um erro ocorra.
 int SaveGame(tElements *game_elements){
     FILE *pfile;
-    tGameInfo infos;
     if (!(pfile = fopen("lastGame.dat", "wb"))) return 0;
 
     fwrite(&game_elements->player, sizeof(tPlayer), 1, pfile);
@@ -423,7 +434,6 @@ int SaveGame(tElements *game_elements){
 // Carrega o estado do jogo salvo no arquivo binário. Retorna 0 caso um erro ocorra.
 int LoadGame(tElements *game_elements){
     FILE *pfile;
-    tGameInfo infos;
     if (!(pfile = fopen("lastGame.dat", "rb"))) return 0;
     
     FreeBoxGroup(&game_elements->boxGroup);
@@ -481,9 +491,11 @@ int LoadGame(tElements *game_elements){
 // Inicia o jogo do 0. Retorna 0 caso um erro ocorra.
 int StartGame(tElements *game_elements){
     resetBombInfo(&game_elements->bomb);
+    int score = game_elements->player.score;
     game_elements->player = (tPlayer){{0,0}, {0,0}, {0,1}, true, 7, IDLE, 0, 3, 0, 3, false, 0.0f};
-    game_elements->player.player_sprite = LoadTexture("sprites/jogador.png");
+    game_elements->player.player_sprite = LoadTexture("sprites/jogador.png"); 
     game_elements->player.lives = 3;
+    game_elements->player.score = score;
     game_elements->player.is_invincible = false;
     game_elements->player.invincibility_timer = 0;
     GetPlayerStartPos(&game_elements->player, &game_elements->map);
@@ -515,8 +527,6 @@ void ChangeMap(tElements *game_elements, AudioManager audio){
     WaitTime(2.6);
     game_elements->map = game_elements->maps[next_map_index];
 
-    int score = game_elements->player.score;
     StartGame(game_elements);
-    game_elements->player.score = score;
 
 }

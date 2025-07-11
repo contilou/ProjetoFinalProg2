@@ -43,8 +43,9 @@ int GetMapMatrix(tMap *map, FILE *map_text){
     return 1;
 }
 
-//Percorre a matriz do mapa e desenha na tela uma parede indestrutivel para cada elemento que tiver 'W'  (Deve ser utilizada na área de desenho na main.c
-//E desenha na tela uma parede destruitivel para cada elemento que tiver 'D' 
+/*Percorre a matriz do mapa e desenha na tela uma parede indestrutivel para cada elemento que tiver 'W'
+(Deve ser utilizada na área de desenho na main.c
+E desenha na tela uma parede destruitivel para cada elemento que tiver 'D' */
 void DrawWalls(tMap* map){
     for(int i = 0; i < map->rows; i++){
         for(int j = 0; j < map->columns; j++){
@@ -81,6 +82,11 @@ int InitMaps(tMap **maps, int *num_maps){
         } 
 
         *maps = (tMap *) realloc(*maps, sizeof(tMap) * count );
+
+        if (*maps == NULL){
+            return -1;
+        }
+
         Texture2D wall_sprite = LoadTexture("sprites/parede.png");
         (*maps)[count - 1] = (tMap){current_file, NULL, count, 25, 60, 20, wall_sprite};
 
@@ -91,7 +97,7 @@ int InitMaps(tMap **maps, int *num_maps){
         fclose(map_text);
         count++;
     }
-    *num_maps = count;
+    *num_maps = count - 1;
 
     return 0;
 } 

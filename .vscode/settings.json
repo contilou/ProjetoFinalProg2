@@ -8,7 +8,7 @@
     "**/*.o": true,
     "**/*.exe": true
   },
-  "myproject.name": "JogaoDeTeste",
+  "myproject.name": "SuperBombinhoAdventures",
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
   "C_Cpp_Runner.debuggerPath": "gdb",
@@ -73,6 +73,7 @@
     "sounds.h": "c",
     "map.h": "c",
     "player.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "enemy.h": "c"
   }
 }

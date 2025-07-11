@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 #include "map.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct {
 

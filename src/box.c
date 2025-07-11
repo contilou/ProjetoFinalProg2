@@ -1,5 +1,5 @@
 #include "box.h"
-#include <stdlib.h>
+
 
 int InitBoxes(tBoxGroup *group, tMap *map) {
 
@@ -27,16 +27,11 @@ int InitBoxes(tBoxGroup *group, tMap *map) {
     group->boxes = (tBox*) malloc(sizeof(tBox) * total);
     group->keys = (tKey*) malloc(sizeof(tKey) * group->key_count);
 
-    // Verifica se a alocacao de memoria foi feita corretamente para as caixas
-    if (group->boxes == NULL){
+    // Verifica se a alocacao de memoria foi feita corretamente para as caixas e as chaves. Se errado retorna 0
+    if (group->boxes == NULL || group->keys == NULL){
         return 0;
     }
     
-    // Realiza a mesma verificacao de erro para as chaves 
-    if (group->keys == NULL){
-        return 0;
-    }
-
     for(int i = 0; i < group->key_count; i++){
         group->keys[i].unlocked = false;
         group->keys[i].picked = false;
