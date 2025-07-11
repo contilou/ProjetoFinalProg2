@@ -332,6 +332,7 @@ void UpdateDrawFrame(tElements *game_elements)
     //EndMode2D();
 
     int height = 500;
+    for(int i = 0; i < 4; i++){
         //Desenha a borda da HUD verticalmente
         DrawTexture(game_elements->map.wall_sprite, 0, height, GRAY);
         DrawTexture(game_elements->map.wall_sprite, 1180, height, GRAY);
