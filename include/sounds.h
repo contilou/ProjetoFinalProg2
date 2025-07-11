@@ -15,6 +15,7 @@ typedef struct {
     Sound somBotao;
     Music musicaMenu;
     Music musicaPausa;
+    Music musicaJogo;
 } AudioManager;
 AudioManager Carregasom(void);
 void EliminaAudio(AudioManager som);
