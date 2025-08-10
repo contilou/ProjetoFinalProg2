@@ -8,13 +8,13 @@ O objetivo é coletar chaves, destruir obstáculos e derrotar inimigos usando bo
 ## 🖼️ Capturas de Tela
 
 ### Menu Principal
-![Menu Principal](images/menu.jpg)
+<img src="images/menu.jpg" alt="Menu Principal" width="785" height="392" />
 
 ### Gameplay
 ![Gameplay](images/bomberman.gif)
 
 ### Tela de Pausa
-![Tela de Pausa](images/pause.jpg)
+<img src="images/pause.jpg" alt="Tela de Pausa" width="785" height="392" />
 
 ---
 
